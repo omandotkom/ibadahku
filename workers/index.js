@@ -9,6 +9,35 @@ function json(data, status = 200) {
   });
 }
 
+function rowToPackage(row) {
+  let features = [];
+  try {
+    const parsed = JSON.parse(row.features ?? "[]");
+    if (Array.isArray(parsed)) {
+      features = parsed.map((item) => String(item));
+    }
+  } catch {
+    features = [];
+  }
+
+  return {
+    id: String(row.id),
+    name: String(row.name),
+    description: String(row.description),
+    price: Number(row.price),
+    duration: Number(row.duration),
+    hotelStars: Number(row.hotel_stars),
+    airline: String(row.airline),
+    departureDate: String(row.departure_date),
+    quota: Number(row.quota),
+    availableQuota: Number(row.available_quota),
+    features,
+    isPopular: Number(row.is_popular) === 1,
+    isRecommended: Number(row.is_recommended) === 1,
+    image: row.image ? String(row.image) : undefined,
+  };
+}
+
 function validatePackage(pkg) {
   if (!pkg || typeof pkg !== "object") {
     return "Body package tidak valid.";
@@ -43,14 +72,53 @@ function validatePackage(pkg) {
   return null;
 }
 
-export async function onRequestPost(context) {
-  if (!context.env.DB) {
+async function handleGetPackages(env) {
+  if (!env.DB) {
+    return json({ error: "D1 binding DB belum tersedia." }, 500);
+  }
+
+  try {
+    const result = await env.DB.prepare(
+      `SELECT
+        id,
+        name,
+        description,
+        price,
+        duration,
+        hotel_stars,
+        airline,
+        departure_date,
+        quota,
+        available_quota,
+        features,
+        is_popular,
+        is_recommended,
+        image
+      FROM packages
+      ORDER BY departure_date ASC, created_at DESC`,
+    ).all();
+
+    const rows = Array.isArray(result.results) ? result.results : [];
+    return json({ data: rows.map(rowToPackage) });
+  } catch (error) {
+    return json(
+      {
+        error: "Gagal mengambil data paket dari D1.",
+        detail: error instanceof Error ? error.message : "Unknown error",
+      },
+      500,
+    );
+  }
+}
+
+async function handleUpsertPackage(request, env) {
+  if (!env.DB) {
     return json({ error: "D1 binding DB belum tersedia." }, 500);
   }
 
   let payload;
   try {
-    payload = await context.request.json();
+    payload = await request.json();
   } catch {
     return json({ error: "Body JSON tidak valid." }, 400);
   }
@@ -65,11 +133,11 @@ export async function onRequestPost(context) {
   const statements = [];
 
   if (previousId && previousId !== pkg.id) {
-    statements.push(context.env.DB.prepare("DELETE FROM packages WHERE id = ?").bind(previousId));
+    statements.push(env.DB.prepare("DELETE FROM packages WHERE id = ?").bind(previousId));
   }
 
   statements.push(
-    context.env.DB
+    env.DB
       .prepare(
         `INSERT INTO packages (
           id,
@@ -123,7 +191,7 @@ export async function onRequestPost(context) {
   );
 
   try {
-    await context.env.DB.batch(statements);
+    await env.DB.batch(statements);
     return json({ ok: true, id: pkg.id });
   } catch (error) {
     return json(
@@ -136,12 +204,12 @@ export async function onRequestPost(context) {
   }
 }
 
-export async function onRequestDelete(context) {
-  if (!context.env.DB) {
+async function handleDeletePackage(request, env) {
+  if (!env.DB) {
     return json({ error: "D1 binding DB belum tersedia." }, 500);
   }
 
-  const url = new URL(context.request.url);
+  const url = new URL(request.url);
   const id = url.searchParams.get("id");
 
   if (!id) {
@@ -149,7 +217,7 @@ export async function onRequestDelete(context) {
   }
 
   try {
-    await context.env.DB.prepare("DELETE FROM packages WHERE id = ?").bind(id).run();
+    await env.DB.prepare("DELETE FROM packages WHERE id = ?").bind(id).run();
     return json({ ok: true, id });
   } catch (error) {
     return json(
@@ -161,3 +229,27 @@ export async function onRequestDelete(context) {
     );
   }
 }
+
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+
+    if (url.pathname === "/api/packages" && request.method === "GET") {
+      return handleGetPackages(env);
+    }
+
+    if (url.pathname === "/api/admin/packages" && request.method === "POST") {
+      return handleUpsertPackage(request, env);
+    }
+
+    if (url.pathname === "/api/admin/packages" && request.method === "DELETE") {
+      return handleDeletePackage(request, env);
+    }
+
+    if (env.ASSETS) {
+      return env.ASSETS.fetch(request);
+    }
+
+    return new Response("Not found", { status: 404 });
+  },
+};

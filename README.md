@@ -1,19 +1,19 @@
 ﻿# ibadahku.id
 
 Website layanan Umroh dan Haji dengan desain Modern Minimalist Elegant.
-Dibangun dengan Next.js + Tailwind CSS, optimized untuk deployment static di Cloudflare Pages.
+Dibangun dengan Next.js + Tailwind CSS, optimized untuk deployment di Cloudflare Workers (Workers Builds + Static Assets + D1).
 
 ![Tech Stack](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
 ![Tech Stack](https://img.shields.io/badge/Tailwind_CSS-4-38B2AC?style=flat-square&logo=tailwind-css)
 ![Tech Stack](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript)
-![Deployment](https://img.shields.io/badge/Cloudflare_Pages-F38020?style=flat-square&logo=cloudflare)
+![Deployment](https://img.shields.io/badge/Cloudflare_Workers-F38020?style=flat-square&logo=cloudflare)
 
 ## ✨ Fitur
 
 - **Responsive Design** - Mobile-first approach dengan breakpoints optimal
 - **Modern Animations** - Smooth transitions menggunakan Framer Motion
 - **SEO Optimized** - Meta tags, Open Graph, Twitter Cards
-- **Static Export** - Ready untuk deploy di Cloudflare Pages
+- **Static Export** - Ready untuk deploy di Cloudflare Workers Assets
 - **TypeScript** - Type-safe development
 - **Modular Components** - Clean architecture dengan reusable components
 
@@ -100,40 +100,19 @@ my-app/
 - **Tablet**: 640px - 1024px
 - **Desktop**: > 1024px
 
-## 🌐 Deployment ke Cloudflare Pages
+## 🌐 Deployment ke Cloudflare Workers Builds
 
-### Cara 1: Drag & Drop (Paling Mudah)
-
-1. Build project:
-```bash
-npm run build
-```
-
-2. Compress folder `dist` menjadi zip
-
-3. Login ke [Cloudflare Dashboard](https://dash.cloudflare.com)
-
-4. Pergi ke **Pages** → **Create a project** → **Upload assets**
-
-5. Drag & drop file `dist.zip` atau folder `dist`
-
-6. Klik **Deploy site**
-
-### Cara 2: Git Integration (Auto Deploy)
-
-1. Push project ke GitHub/GitLab
-
-2. Di Cloudflare Dashboard, pilih **Pages** → **Create a project** → **Connect to Git**
-
-3. Pilih repository dan branch (biasanya `main` atau `master`)
-
-4. Build settings:
+1. Push project ke GitHub.
+2. Di Cloudflare Dashboard, pilih **Workers & Pages** → **Create** → **Import a repository**.
+3. Pilih repo ini, lalu set:
    - **Build command**: `npm run build`
-   - **Build output directory**: `dist`
+   - **Deploy command**: `npx wrangler deploy`
+4. Simpan dan deploy.
 
-5. Klik **Save and Deploy**
-
-Setiap kali push ke branch, Cloudflare akan otomatis rebuild dan redeploy.
+Project ini sudah menyediakan `wrangler.jsonc`:
+- Worker entry: `workers/index.js`
+- Static assets directory: `dist`
+- API routes: `/api/packages` dan `/api/admin/packages`
 
 ### Custom Domain
 
@@ -173,7 +152,7 @@ npm run start     # Start production server
 npm run lint      # ESLint check
 ```
 
-## Dynamic Paket (Cloudflare D1 + Functions)
+## Dynamic Paket (Cloudflare D1 + Worker API)
 
 Route yang sudah ditambahkan:
 
@@ -182,11 +161,12 @@ Route yang sudah ditambahkan:
 - `DELETE /api/admin/packages?id=<package_id>` untuk hapus paket
 - Halaman admin: `/admin/`
 
-Setup singkat di Cloudflare Pages:
+Setup singkat di Cloudflare Worker:
 
-1. Buat binding D1 dengan nama `DB` pada project Pages.
+1. Buka project Worker → **Settings** → **Bindings**.
+2. Tambahkan D1 binding dengan nama `DB` ke database `ibadahku`.
 2. Jalankan schema D1 dari `cloudflare/d1/schema.sql`.
-3. Deploy project (folder `functions/` akan dipakai otomatis oleh Pages Functions).
+3. Deploy project (Worker akan serve static assets dari `dist` dan API dari `workers/index.js`).
 4. Buka `/admin/`, lalu kelola paket. Halaman publik akan fetch otomatis dari `/api/packages`.
 
 Contoh eksekusi schema D1 via Wrangler:
