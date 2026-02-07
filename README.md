@@ -1,4 +1,4 @@
-# ibadahku.id
+﻿# ibadahku.id
 
 Website layanan Umroh dan Haji dengan desain Modern Minimalist Elegant.
 Dibangun dengan Next.js + Tailwind CSS, optimized untuk deployment static di Cloudflare Pages.
