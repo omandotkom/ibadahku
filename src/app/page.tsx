@@ -16,6 +16,7 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/sections/Navbar";
 import HeroSlider from "@/components/sections/HeroSlider";
+import Legalitas from "@/components/sections/Legalitas";
 import PackageCards from "@/components/sections/PackageCards";
 import Gallery from "@/components/sections/Gallery";
 import Features from "@/components/sections/Features";
@@ -74,6 +75,11 @@ export default function Home() {
         {/* Hero Slider Section */}
         <section aria-label="Beranda">
           <HeroSlider />
+        </section>
+
+        {/* Company Legality */}
+        <section aria-label="Legalitas Perusahaan">
+          <Legalitas />
         </section>
         
         {/* Package Offerings */}
