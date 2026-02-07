@@ -165,9 +165,12 @@ Setup singkat di Cloudflare Worker:
 
 1. Buka project Worker → **Settings** → **Bindings**.
 2. Tambahkan D1 binding dengan nama `DB` ke database `ibadahku`.
-2. Jalankan schema D1 dari `cloudflare/d1/schema.sql`.
-3. Deploy project (Worker akan serve static assets dari `dist` dan API dari `workers/index.js`).
-4. Buka `/admin/`, lalu kelola paket. Halaman publik akan fetch otomatis dari `/api/packages`.
+3. Tambahkan R2 binding dengan nama `PACKAGE_IMAGES` ke bucket R2 kamu.
+   Endpoint upload admin: `POST /api/admin/upload-image`.
+   URL gambar hasil upload: `/media/<object_key>`.
+4. Jalankan schema D1 dari `cloudflare/d1/schema.sql`.
+5. Deploy project (Worker akan serve static assets dari `dist` dan API dari `workers/index.js`).
+6. Buka `/admin/`, lalu kelola paket. Halaman publik akan fetch otomatis dari `/api/packages`.
 
 Contoh eksekusi schema D1 via Wrangler:
 

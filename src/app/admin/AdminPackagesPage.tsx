@@ -129,7 +129,7 @@ function getInitialState(): InitialState {
 
 function normalizeApiError(message: string): string {
   if (message.includes("404")) {
-    return "API belum aktif di environment ini. Deploy Functions Cloudflare untuk sinkron server.";
+    return "API belum aktif di environment ini. Deploy Worker terbaru untuk sinkron server.";
   }
 
   return message;
@@ -142,6 +142,8 @@ export default function AdminPackagesPage() {
   const [editingId, setEditingId] = useState<string | null>(initial.selectedId);
   const [message, setMessage] = useState<string>("");
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false);
 
   const isEditing = editingId !== null && packageList.some((item) => item.id === editingId);
 
@@ -206,6 +208,7 @@ export default function AdminPackagesPage() {
   function handleNewPackage() {
     setEditingId(null);
     setForm(toForm());
+    setSelectedImageFile(null);
     setMessage("Mode tambah paket baru aktif.");
   }
 
@@ -237,6 +240,42 @@ export default function AdminPackagesPage() {
     if (!response.ok) {
       const payload = (await response.json().catch(() => null)) as { error?: string } | null;
       throw new Error(payload?.error ?? `POST /api/admin/packages gagal (${response.status})`);
+    }
+  }
+
+  async function handleUploadImage() {
+    if (!selectedImageFile) {
+      setMessage("Pilih file gambar terlebih dahulu.");
+      return;
+    }
+
+    setIsUploadingImage(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedImageFile);
+
+      const response = await fetch("/api/admin/upload-image", {
+        method: "POST",
+        body: formData,
+      });
+
+      const payload = (await response.json().catch(() => null)) as
+        | { url?: string; error?: string }
+        | null;
+
+      if (!response.ok || !payload?.url) {
+        throw new Error(payload?.error ?? `POST /api/admin/upload-image gagal (${response.status})`);
+      }
+
+      updateField("image", payload.url);
+      setSelectedImageFile(null);
+      setMessage("Gambar berhasil diupload ke R2.");
+    } catch (uploadError) {
+      const detail = uploadError instanceof Error ? uploadError.message : "Unknown error";
+      setMessage(`Upload gambar gagal. Detail: ${normalizeApiError(detail)}`);
+    } finally {
+      setIsUploadingImage(false);
     }
   }
 
@@ -357,7 +396,7 @@ export default function AdminPackagesPage() {
             Kelola Paket Umroh
           </h1>
           <p className="mt-2 text-sm text-[var(--text-secondary)]">
-            Form tersambung ke `/api/admin/packages` (Cloudflare Functions + D1).
+            Form tersambung ke `/api/admin/packages` (Cloudflare Worker + D1).
           </p>
         </header>
 
@@ -573,6 +612,22 @@ export default function AdminPackagesPage() {
                   value={form.image}
                   onChange={(e) => updateField("image", e.target.value)}
                 />
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(e) => setSelectedImageFile(e.target.files?.[0] ?? null)}
+                    className="max-w-full text-xs text-[var(--text-secondary)]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void handleUploadImage()}
+                    disabled={!selectedImageFile || isUploadingImage}
+                    className="rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-medium text-[var(--text-primary)] disabled:opacity-50"
+                  >
+                    {isUploadingImage ? "Uploading..." : "Upload ke R2"}
+                  </button>
+                </div>
               </label>
 
               <label className="space-y-1 text-sm md:col-span-2">

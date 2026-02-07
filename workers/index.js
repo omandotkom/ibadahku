@@ -1,12 +1,22 @@
 ﻿const JSON_HEADERS = {
   "content-type": "application/json; charset=utf-8",
 };
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
     headers: JSON_HEADERS,
   });
+}
+
+function sanitizeFileName(name) {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9.\-_]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 function rowToPackage(row) {
@@ -230,7 +240,85 @@ async function handleDeletePackage(request, env) {
   }
 }
 
-export default {
+async function handleUploadImage(request, env) {
+  if (!env.PACKAGE_IMAGES) {
+    return json({ error: "R2 binding PACKAGE_IMAGES belum tersedia." }, 500);
+  }
+
+  let form;
+  try {
+    form = await request.formData();
+  } catch {
+    return json({ error: "Body multipart/form-data tidak valid." }, 400);
+  }
+
+  const fileValue = form.get("file");
+  if (!(fileValue instanceof File)) {
+    return json({ error: "Field file wajib diisi." }, 400);
+  }
+
+  if (!ALLOWED_IMAGE_TYPES.has(fileValue.type)) {
+    return json({ error: "Tipe file harus JPG, PNG, atau WEBP." }, 400);
+  }
+
+  if (fileValue.size > MAX_UPLOAD_BYTES) {
+    return json({ error: "Ukuran file maksimal 5MB." }, 400);
+  }
+
+  const safeName = sanitizeFileName(fileValue.name || "image");
+  const uniqueKey = `packages/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
+
+  try {
+    await env.PACKAGE_IMAGES.put(uniqueKey, fileValue.stream(), {
+      httpMetadata: {
+        contentType: fileValue.type,
+      },
+    });
+  } catch (error) {
+    return json(
+      {
+        error: "Gagal upload gambar ke R2.",
+        detail: error instanceof Error ? error.message : "Unknown error",
+      },
+      500,
+    );
+  }
+
+  return json({
+    ok: true,
+    key: uniqueKey,
+    url: `/media/${uniqueKey}`,
+  });
+}
+
+async function handleGetMedia(request, env) {
+  if (!env.PACKAGE_IMAGES) {
+    return new Response("R2 binding PACKAGE_IMAGES belum tersedia.", { status: 500 });
+  }
+
+  const url = new URL(request.url);
+  const key = decodeURIComponent(url.pathname.replace(/^\/media\//, ""));
+
+  if (!key || key === url.pathname) {
+    return new Response("Media key tidak valid.", { status: 400 });
+  }
+
+  const object = await env.PACKAGE_IMAGES.get(key);
+  if (!object) {
+    return new Response("Not found", { status: 404 });
+  }
+
+  const headers = new Headers();
+  if (typeof object.writeHttpMetadata === "function") {
+    object.writeHttpMetadata(headers);
+  }
+  headers.set("etag", object.httpEtag);
+  headers.set("cache-control", "public, max-age=31536000, immutable");
+
+  return new Response(object.body, { headers });
+}
+
+const worker = {
   async fetch(request, env) {
     const url = new URL(request.url);
 
@@ -246,6 +334,14 @@ export default {
       return handleDeletePackage(request, env);
     }
 
+    if (url.pathname === "/api/admin/upload-image" && request.method === "POST") {
+      return handleUploadImage(request, env);
+    }
+
+    if (url.pathname.startsWith("/media/") && request.method === "GET") {
+      return handleGetMedia(request, env);
+    }
+
     if (env.ASSETS) {
       return env.ASSETS.fetch(request);
     }
@@ -253,3 +349,5 @@ export default {
     return new Response("Not found", { status: 404 });
   },
 };
+
+export default worker;
