@@ -39,8 +39,6 @@ function rowToPackage(row) {
     hotelStars: Number(row.hotel_stars),
     airline: String(row.airline),
     departureDate: String(row.departure_date),
-    quota: Number(row.quota),
-    availableQuota: Number(row.available_quota),
     features,
     isPopular: Number(row.is_popular) === 1,
     isRecommended: Number(row.is_recommended) === 1,
@@ -60,7 +58,7 @@ function validatePackage(pkg) {
     }
   }
 
-  const numberFields = ["price", "duration", "quota", "availableQuota", "hotelStars"];
+  const numberFields = ["price", "duration", "hotelStars"];
   for (const key of numberFields) {
     if (typeof pkg[key] !== "number" || Number.isNaN(pkg[key])) {
       return `Field ${key} harus berupa angka.`;
@@ -69,10 +67,6 @@ function validatePackage(pkg) {
 
   if (![3, 4, 5].includes(pkg.hotelStars)) {
     return "Field hotelStars harus 3, 4, atau 5.";
-  }
-
-  if (pkg.availableQuota > pkg.quota) {
-    return "availableQuota tidak boleh lebih besar dari quota.";
   }
 
   if (!Array.isArray(pkg.features) || pkg.features.length === 0) {
@@ -191,8 +185,8 @@ async function handleUpsertPackage(request, env) {
         pkg.hotelStars,
         pkg.airline.trim(),
         pkg.departureDate,
-        pkg.quota,
-        pkg.availableQuota,
+        typeof pkg.quota === "number" ? pkg.quota : 0,
+        typeof pkg.availableQuota === "number" ? pkg.availableQuota : 0,
         JSON.stringify(pkg.features.map((item) => String(item).trim()).filter(Boolean)),
         pkg.isPopular ? 1 : 0,
         pkg.isRecommended ? 1 : 0,

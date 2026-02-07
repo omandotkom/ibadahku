@@ -161,13 +161,11 @@ export default function Hero() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-[var(--text-muted)] mb-1">Sisa Kuota</p>
+                        <p className="text-xs text-[var(--text-muted)] mb-1">Mulai Dari</p>
                         <p className="text-2xl font-bold text-[var(--brand-green-primary)]">
-                          {nextPackage ? nextPackage.availableQuota : "-"}
+                          {nextPackage ? `${(nextPackage.price / 1000000).toFixed(1)}jt` : "-"}
                         </p>
-                        <p className="text-xs text-[var(--text-muted)]">
-                          dari {nextPackage ? nextPackage.quota : "-"}
-                        </p>
+                        <p className="text-xs text-[var(--text-muted)]">per jamaah</p>
                       </div>
                     </div>
                   </div>

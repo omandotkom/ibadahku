@@ -17,8 +17,6 @@ type PackageForm = {
   hotelStars: "3" | "4" | "5";
   airline: string;
   departureDate: string;
-  quota: string;
-  availableQuota: string;
   featuresText: string;
   isPopular: boolean;
   isRecommended: boolean;
@@ -41,8 +39,6 @@ function toForm(pkg?: Package): PackageForm {
     hotelStars: pkg ? (String(pkg.hotelStars) as "3" | "4" | "5") : "3",
     airline: pkg?.airline ?? "",
     departureDate: pkg?.departureDate ?? "",
-    quota: pkg ? String(pkg.quota) : "",
-    availableQuota: pkg ? String(pkg.availableQuota) : "",
     featuresText: pkg?.features.join("\n") ?? "",
     isPopular: pkg?.isPopular ?? false,
     isRecommended: pkg?.isRecommended ?? false,
@@ -65,8 +61,6 @@ function toPackage(form: PackageForm): Package {
     hotelStars: Number(form.hotelStars) as 3 | 4 | 5,
     airline: form.airline.trim(),
     departureDate: form.departureDate,
-    quota: Number(form.quota),
-    availableQuota: Number(form.availableQuota),
     features,
     isPopular: form.isPopular,
     isRecommended: form.isRecommended,
@@ -79,10 +73,10 @@ function isValidPackage(pkg: Package): boolean {
     return false;
   }
 
-  const validNumberFields = [pkg.price, pkg.duration, pkg.quota, pkg.availableQuota];
+  const validNumberFields = [pkg.price, pkg.duration];
   const hasInvalidNumber = validNumberFields.some((value) => Number.isNaN(value) || value < 0);
 
-  if (hasInvalidNumber || pkg.availableQuota > pkg.quota) {
+  if (hasInvalidNumber) {
     return false;
   }
 
@@ -214,7 +208,7 @@ export default function AdminPackagesPage() {
 
   function validateForm(pkg: Package): string | null {
     if (!isValidPackage(pkg)) {
-      return "Data belum valid. Cek field wajib, angka, kuota, dan fitur paket.";
+      return "Data belum valid. Cek field wajib, angka, dan fitur paket.";
     }
 
     const duplicateId = packageList.some((item) => item.id === pkg.id && item.id !== editingId);
@@ -441,7 +435,7 @@ export default function AdminPackagesPage() {
                     <p className="text-sm font-semibold text-[var(--text-primary)]">{pkg.name}</p>
                     <p className="text-xs text-[var(--text-secondary)]">{pkg.id}</p>
                     <p className="mt-1 text-xs text-[var(--text-secondary)]">
-                      {formatPrice(pkg.price)} | Sisa {pkg.availableQuota}/{pkg.quota}
+                      {formatPrice(pkg.price)}
                     </p>
                   </button>
                 );
@@ -578,30 +572,6 @@ export default function AdminPackagesPage() {
                   className={inputClass}
                   value={form.departureDate}
                   onChange={(e) => updateField("departureDate", e.target.value)}
-                  required
-                />
-              </label>
-
-              <label className="space-y-1 text-sm">
-                <span className="text-[var(--text-secondary)]">Kuota Total</span>
-                <input
-                  type="number"
-                  min={0}
-                  className={inputClass}
-                  value={form.quota}
-                  onChange={(e) => updateField("quota", e.target.value)}
-                  required
-                />
-              </label>
-
-              <label className="space-y-1 text-sm">
-                <span className="text-[var(--text-secondary)]">Kuota Tersedia</span>
-                <input
-                  type="number"
-                  min={0}
-                  className={inputClass}
-                  value={form.availableQuota}
-                  onChange={(e) => updateField("availableQuota", e.target.value)}
                   required
                 />
               </label>

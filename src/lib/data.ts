@@ -48,9 +48,7 @@ export const packages: Package[] = [
     duration: 12,
     hotelStars: 3,
     airline: "Garuda Indonesia",
-    departureDate: "2024-03-15",
-    quota: 45,
-    availableQuota: 12,
+    departureDate: "2026-03-15",
     features: [
       "Tiket pesawat PP",
       "Hotel Makkah 3* (5 malam)",
@@ -72,9 +70,7 @@ export const packages: Package[] = [
     duration: 12,
     hotelStars: 4,
     airline: "Saudia Airlines",
-    departureDate: "2024-03-20",
-    quota: 40,
-    availableQuota: 8,
+    departureDate: "2026-03-20",
     features: [
       "Tiket pesawat PP",
       "Hotel Makkah 4* (5 malam)",
@@ -99,9 +95,7 @@ export const packages: Package[] = [
     duration: 15,
     hotelStars: 5,
     airline: "Emirates",
-    departureDate: "2024-04-05",
-    quota: 25,
-    availableQuota: 5,
+    departureDate: "2026-04-05",
     features: [
       "Tiket pesawat PP kelas bisnis",
       "Hotel Makkah 5* view Ka'bah (7 malam)",
@@ -126,9 +120,7 @@ export const packages: Package[] = [
     duration: 10,
     hotelStars: 4,
     airline: "Qatar Airways",
-    departureDate: "2024-03-25",
-    quota: 30,
-    availableQuota: 3,
+    departureDate: "2026-03-25",
     features: [
       "Tiket pesawat PP",
       "Hotel Makkah 4* (6 malam)",

@@ -15,8 +15,6 @@ function isPackage(value: unknown): value is Package {
     typeof pkg.hotelStars === "number" &&
     typeof pkg.airline === "string" &&
     typeof pkg.departureDate === "string" &&
-    typeof pkg.quota === "number" &&
-    typeof pkg.availableQuota === "number" &&
     Array.isArray(pkg.features)
   );
 }

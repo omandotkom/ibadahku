@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     "haji", 
     "travel umroh",
     "paket umroh",
-    "paket umroh 2024",
+    "paket umroh 2026",
     "biro perjalanan haji umroh",
     "travel haji",
     "umroh murah",

@@ -20,7 +20,7 @@ export function formatPrice(price: number): string {
 /**
  * Format date to Indonesian locale string
  * @param date - Date string or Date object
- * @returns Formatted date string (e.g., "15 Januari 2024")
+ * @returns Formatted date string (e.g., "15 Januari 2026")
  */
 export function formatDate(date: string | Date): string {
   const d = typeof date === "string" ? new Date(date) : date;

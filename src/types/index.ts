@@ -16,8 +16,6 @@ export interface Package {
   hotelStars: 3 | 4 | 5;
   airline: string;
   departureDate: string;
-  quota: number;
-  availableQuota: number;
   features: string[];
   isPopular?: boolean;
   isRecommended?: boolean;

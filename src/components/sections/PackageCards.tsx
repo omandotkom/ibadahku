@@ -113,13 +113,6 @@ function PackageCard({
           {pkg.isRecommended && <Badge variant="recommended">Recommended</Badge>}
         </div>
 
-        {/* Quota Badge */}
-        <div className="absolute top-4 right-4 z-10">
-          <div className="bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 text-xs font-medium text-[var(--text-secondary)] shadow-sm">
-            Sisa {pkg.availableQuota} kuota
-          </div>
-        </div>
-
         {/* Image with lazy loading */}
         <img
           src={imageSrc}
@@ -194,7 +187,10 @@ function PackageCard({
 
           {/* CTA Button */}
           <div className="grid gap-2">
-            <div onClick={(event) => event.stopPropagation()}>
+            <div
+              className="flex justify-center"
+              onClick={(event) => event.stopPropagation()}
+            >
               <Button
                 onClick={() => onOpen(pkg, index)}
                 className="w-full justify-center"
@@ -203,7 +199,10 @@ function PackageCard({
                 Lihat Detail
               </Button>
             </div>
-            <div onClick={(event) => event.stopPropagation()}>
+            <div
+              className="flex justify-center"
+              onClick={(event) => event.stopPropagation()}
+            >
               <Button
                 href={whatsappUrl}
                 isExternal
@@ -290,7 +289,6 @@ function PackageDetailModal({
             <p><strong>Hotel:</strong> {pkg.hotelStars} bintang</p>
             <p><strong>Maskapai:</strong> {pkg.airline}</p>
             <p><strong>Berangkat:</strong> {formatDate(pkg.departureDate)}</p>
-            <p><strong>Kuota:</strong> {pkg.availableQuota}/{pkg.quota}</p>
           </div>
 
           <div>
@@ -354,7 +352,7 @@ export default function PackageCards() {
       <Container>
         <SectionHeader
           id="packages-heading"
-          badge="Paket Umroh 2024"
+          badge="Paket Umroh 2026"
           title="Pilihan Paket Terbaik Untuk Anda"
           subtitle="Berbagai pilihan paket dengan fasilitas lengkap dan harga transparan. Semua paket sudah termasuk visa, tiket pesawat, hotel, dan makanan."
           align="center"

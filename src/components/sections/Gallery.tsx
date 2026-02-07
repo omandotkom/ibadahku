@@ -28,6 +28,30 @@ type GalleryItem = {
 
 const galleryItems: GalleryItem[] = [
   {
+    id: 1001,
+    src: "/assets/gallery/wa-video-2026-02-07-173339.mp4",
+    alt: "Video dokumentasi jamaah 1",
+    caption: "Dokumentasi Jamaah 1",
+    category: "Video",
+    type: "video",
+  },
+  {
+    id: 1002,
+    src: "/assets/gallery/wa-video-2026-02-07-173512.mp4",
+    alt: "Video dokumentasi jamaah 2",
+    caption: "Dokumentasi Jamaah 2",
+    category: "Video",
+    type: "video",
+  },
+  {
+    id: 1003,
+    src: "/assets/gallery/wa-video-2026-02-07-173424.mp4",
+    alt: "Video dokumentasi jamaah 3",
+    caption: "Dokumentasi Jamaah 3",
+    category: "Video",
+    type: "video",
+  },
+  {
     id: 1,
     src: "/assets/gallery/VID-20250326-WA0021.jpg",
     alt: "Momen perjalanan umroh",
@@ -245,13 +269,17 @@ export default function Gallery() {
               }`}
               onClick={() => openLightbox(index)}
             >
-              <div className="aspect-square md:aspect-auto md:h-full min-h-[200px] bg-gray-100">
+              <div
+                className={`aspect-square md:aspect-auto md:h-full min-h-[200px] ${
+                  item.type === "video" ? "bg-black" : "bg-gray-100"
+                }`}
+              >
                 {item.type === "video" ? (
                   // Video thumbnail with play icon
                   <>
                     <video
                       src={item.src}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover bg-black"
                       muted
                       playsInline
                     />
@@ -361,7 +389,7 @@ export default function Gallery() {
             >
               {filteredItems[selectedItem].type === "video" ? (
                 // Video player in lightbox
-                <div className="relative">
+                <div className="relative rounded-lg bg-black">
                   <video
                     ref={videoRef}
                     src={filteredItems[selectedItem].src}
@@ -369,7 +397,7 @@ export default function Gallery() {
                     loop
                     muted={false}
                     controls
-                    className="max-w-full max-h-[70vh] mx-auto rounded-lg"
+                    className="mx-auto max-h-[70vh] max-w-full rounded-lg bg-black"
                   />
                 </div>
               ) : (
