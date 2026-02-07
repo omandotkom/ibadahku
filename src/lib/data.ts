@@ -13,7 +13,7 @@ export const siteConfig: SiteConfig = {
   description: "Layanan perjalanan Umroh dan Haji dengan kualitas terbaik",
   url: "https://ibadahku.id",
   contact: {
-    phone: "+62 812-3456-7890",
+    phone: "+62 812-8612-9604",
     email: "info@ibadahku.id",
     address: "Jl. KH. Ahmad Dahlan No. 123, Jakarta Selatan",
     whatsapp: "6281286129604",
