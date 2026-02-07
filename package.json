@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && npm run copy-assets",
-    "copy-assets": "powershell -Command \"Copy-Item -Path public\\favicon.ico, public\\logo-kabah.svg, public\\apple-touch-icon.png, public\\icon-*.png, public\\og-image.jpg -Destination dist\\ -Force; Copy-Item -Path public\\assets\\* -Destination dist\\assets\\ -Force -Recurse -ErrorAction SilentlyContinue; Write-Host 'Assets copied to dist/'\"",
+    "copy-assets": "node scripts/copy-assets.mjs",
     "start": "next start",
     "lint": "eslint"
   },
