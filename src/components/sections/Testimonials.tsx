@@ -1,7 +1,8 @@
 "use client";
 
+import { useRef, useState, MouseEvent } from "react";
 import { motion } from "framer-motion";
-import { Quote } from "lucide-react";
+import { Quote, ArrowRight } from "lucide-react";
 import { testimonials } from "@/lib/data";
 import Container from "@/components/ui/Container";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -32,11 +33,11 @@ function getInitials(name: string): string {
 }
 
 // Individual Testimonial Card
-function TestimonialCard({ 
-  testimonial, 
-  index 
-}: { 
-  testimonial: typeof testimonials[0]; 
+function TestimonialCard({
+  testimonial,
+  index
+}: {
+  testimonial: typeof testimonials[0];
   index: number;
 }) {
   return (
@@ -45,7 +46,7 @@ function TestimonialCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group relative bg-white rounded-2xl p-6 sm:p-8 shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-black/10 transition-all duration-300 border border-[var(--border)]"
+      className="group relative bg-white rounded-2xl p-6 sm:p-8 shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-black/10 transition-all duration-300 border border-[var(--border)] h-full select-none"
     >
       {/* Quote Icon */}
       <div className="absolute top-6 right-6 w-10 h-10 rounded-full bg-[var(--brand-green-lighter)] flex items-center justify-center">
@@ -91,6 +92,34 @@ function TestimonialCard({
 }
 
 export default function Testimonials() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+
+  const handleMouseDown = (e: MouseEvent) => {
+    if (!scrollRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - scrollRef.current.offsetLeft);
+    setScrollLeft(scrollRef.current.scrollLeft);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging || !scrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX) * 2; // Scroll-fast
+    scrollRef.current.scrollLeft = scrollLeft - walk;
+  };
+
   return (
     <section id="testimonials" className="py-20 lg:py-28 bg-white relative overflow-hidden">
       {/* Background Decorations */}
@@ -106,15 +135,34 @@ export default function Testimonials() {
           className="mb-16"
         />
 
-        {/* Testimonials Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {testimonials.map((testimonial, index) => (
-            <TestimonialCard 
-              key={testimonial.id} 
-              testimonial={testimonial} 
-              index={index} 
-            />
-          ))}
+        {/* Testimonials Horizontal Scroll */}
+        <div className="relative">
+          {/* Scroll Label */}
+          <div className="flex justify-end mb-4 px-4 lg:px-0">
+            <div className="flex items-center gap-2 text-sm text-[var(--text-muted)] animate-pulse">
+              <span>Geser</span>
+              <ArrowRight className="w-4 h-4" />
+            </div>
+          </div>
+
+          <div
+            ref={scrollRef}
+            className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory -mx-4 px-4 lg:mx-0 lg:px-0 cursor-grab active:cursor-grabbing select-none"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            onMouseDown={handleMouseDown}
+            onMouseLeave={handleMouseLeave}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
+          >
+            {testimonials.map((testimonial, index) => (
+              <div key={testimonial.id} className="w-[85vw] md:w-[400px] flex-shrink-0 snap-center pointer-events-none sm:pointer-events-auto">
+                <TestimonialCard
+                  testimonial={testimonial}
+                  index={index}
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Trust Badges */}
@@ -127,19 +175,19 @@ export default function Testimonials() {
         >
           <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
             <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
             </svg>
             <span>Kemenag RI</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
             <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
             <span>100% Aman</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
             <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span>Terverifikasi</span>
           </div>

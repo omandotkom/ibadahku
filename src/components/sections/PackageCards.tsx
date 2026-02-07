@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { 
-  Calendar, 
-  Clock, 
-  Building2, 
-  Plane, 
+import {
+  Calendar,
+  Clock,
+  Building2,
+  Plane,
   Check,
   ArrowRight,
   Download,
@@ -60,12 +60,11 @@ function StarRating({ stars }: { stars: number }) {
 
 // Individual Package Card Component
 function resolveImageSrc(pkg: Package, index: number): string {
-  const fallbackImage = `https://images.unsplash.com/photo-${
-    index === 0 ? "1584551246679-0efe5a131867" :
+  const fallbackImage = `https://images.unsplash.com/photo-${index === 0 ? "1584551246679-0efe5a131867" :
     index === 1 ? "1564769625905-50e93615e769" :
-    index === 2 ? "1542813812-155f9a0e94a0" :
-    "1575105333362-4b72c92fd1b9"
-  }?w=600&auto=format&fit=crop&q=80`;
+      index === 2 ? "1542813812-155f9a0e94a0" :
+        "1575105333362-4b72c92fd1b9"
+    }?w=600&auto=format&fit=crop&q=80`;
   return pkg.image
     ? (pkg.image.startsWith("http://") ||
       pkg.image.startsWith("https://") ||
@@ -106,7 +105,7 @@ function PackageCard({
       tabIndex={0}
     >
       {/* Card Image */}
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative aspect-[2/3] overflow-hidden">
         {/* Badge Positioning */}
         <div className="absolute top-4 left-4 z-10 flex flex-wrap gap-2">
           {pkg.isPopular && <Badge variant="popular">Populer</Badge>}
@@ -136,8 +135,12 @@ function PackageCard({
           {pkg.description}
         </p>
 
+        <div className="mb-4 flex items-center gap-2">
+          <StarRating stars={5} />
+        </div>
+
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        {/* <div className="grid grid-cols-2 gap-3 mb-4">
           <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
             <Clock className="w-4 h-4 text-[var(--brand-green-primary)]" />
             <span>{pkg.duration} Hari</span>
@@ -154,22 +157,17 @@ function PackageCard({
             <Calendar className="w-4 h-4 text-[var(--brand-green-primary)]" />
             <span>{formatDate(pkg.departureDate).split(' ').slice(0, 2).join(' ')}</span>
           </div>
-        </div>
+        </div> */}
 
         {/* Features Preview */}
         <div className="mb-4 flex-1">
           <ul className="space-y-1.5">
-            {pkg.features.slice(0, 4).map((feature, i) => (
+            {pkg.features.map((feature, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
                 <Check className="w-4 h-4 text-[var(--brand-green-primary)] flex-shrink-0 mt-0.5" />
                 <span className="line-clamp-1">{feature}</span>
               </li>
             ))}
-            {pkg.features.length > 4 && (
-              <li className="text-xs text-[var(--text-muted)] pl-6">
-                +{pkg.features.length - 4} fasilitas lainnya
-              </li>
-            )}
           </ul>
         </div>
 
@@ -181,7 +179,7 @@ function PackageCard({
               <p className="text-2xl font-bold text-[var(--brand-green-primary)]">
                 {formatPrice(pkg.price)}
               </p>
-              <p className="text-xs text-[var(--text-muted)]">per orang</p>
+
             </div>
           </div>
 
@@ -270,7 +268,7 @@ function PackageDetailModal({
             aria-label="Download gambar paket"
           >
             <Download className="h-3.5 w-3.5" />
-            Download
+            Brosur
           </a>
         </div>
 
@@ -303,14 +301,16 @@ function PackageDetailModal({
             </ul>
           </div>
 
-          <Button
-            href={whatsappUrl}
-            isExternal
-            className="w-full justify-center"
-            icon={<ArrowRight className="h-4 w-4" />}
-          >
-            Chat via WhatsApp
-          </Button>
+          <div className="flex justify-center mt-6">
+            <Button
+              href={whatsappUrl}
+              isExternal
+              className="justify-center px-8"
+              icon={<ArrowRight className="h-4 w-4" />}
+            >
+              Chat via WhatsApp
+            </Button>
+          </div>
         </div>
       </div>
     </div>
