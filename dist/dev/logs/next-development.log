@@ -1,0 +1,2 @@
+[00:00:01.073] Server  LOG     ✓ Ready in 816ms
+[00:04:09.536] Server  ERROR   ⨯ Error: ENOENT: no such file or directory, open 'C:\WORKSPACE\ibadahku\my-app\dist\dev\server\app\page\build-manifest.json'
