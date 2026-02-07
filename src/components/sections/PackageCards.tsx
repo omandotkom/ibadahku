@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { 
   Calendar, 
@@ -7,7 +8,9 @@ import {
   Building2, 
   Plane, 
   Check,
-  ArrowRight
+  ArrowRight,
+  MessageCircle,
+  X,
 } from "lucide-react";
 import type { Package } from "@/types";
 import { formatPrice, formatDate } from "@/lib/utils";
@@ -55,14 +58,51 @@ function StarRating({ stars }: { stars: number }) {
 }
 
 // Individual Package Card Component
-function PackageCard({ pkg, index }: { pkg: Package; index: number }) {
+function resolveImageSrc(pkg: Package, index: number): string {
+  const fallbackImage = `https://images.unsplash.com/photo-${
+    index === 0 ? "1584551246679-0efe5a131867" :
+    index === 1 ? "1564769625905-50e93615e769" :
+    index === 2 ? "1542813812-155f9a0e94a0" :
+    "1575105333362-4b72c92fd1b9"
+  }?w=600&auto=format&fit=crop&q=80`;
+  return pkg.image
+    ? (pkg.image.startsWith("http://") ||
+      pkg.image.startsWith("https://") ||
+      pkg.image.startsWith("/")
+      ? pkg.image
+      : `/${pkg.image}`)
+    : fallbackImage;
+}
+
+function PackageCard({
+  pkg,
+  index,
+  onOpen,
+}: {
+  pkg: Package;
+  index: number;
+  onOpen: (pkg: Package, index: number) => void;
+}) {
+  const imageSrc = resolveImageSrc(pkg, index);
+  const whatsappUrl =
+    "https://wa.me/6281286129604?text=Assalamualaikum%20saya%20mau%20tanya-tanya%20tentang%20paket%20perjalanan%20ke%20tanah%20suci";
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group relative bg-white rounded-2xl overflow-hidden shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-black/10 transition-all duration-300 border border-[var(--border)] flex flex-col"
+      className="group relative bg-white rounded-2xl overflow-hidden shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-black/10 transition-all duration-300 border border-[var(--border)] flex flex-col cursor-pointer"
+      onClick={() => onOpen(pkg, index)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onOpen(pkg, index);
+        }
+      }}
+      role="button"
+      tabIndex={0}
     >
       {/* Card Image */}
       <div className="relative h-48 overflow-hidden">
@@ -81,12 +121,7 @@ function PackageCard({ pkg, index }: { pkg: Package; index: number }) {
 
         {/* Image with lazy loading */}
         <img
-          src={`https://images.unsplash.com/photo-${
-            index === 0 ? "1584551246679-0efe5a131867" :
-            index === 1 ? "1564769625905-50e93615e769" :
-            index === 2 ? "1542813812-155f9a0e94a0" :
-            "1575105333362-4b72c92fd1b9"
-          }?w=600&auto=format&fit=crop&q=80`}
+          src={imageSrc}
           alt={pkg.name}
           className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
@@ -157,21 +192,148 @@ function PackageCard({ pkg, index }: { pkg: Package; index: number }) {
           </div>
 
           {/* CTA Button */}
-          <Button 
-            href={`#booking-${pkg.id}`} 
-            className="w-full justify-center"
-            icon={<ArrowRight className="w-4 h-4" />}
-          >
-            Pilih Paket
-          </Button>
+          <div className="grid gap-2">
+            <div onClick={(event) => event.stopPropagation()}>
+              <Button
+                onClick={() => onOpen(pkg, index)}
+                className="w-full justify-center"
+                icon={<ArrowRight className="w-4 h-4" />}
+              >
+                Lihat Detail
+              </Button>
+            </div>
+            <div onClick={(event) => event.stopPropagation()}>
+              <Button
+                href={whatsappUrl}
+                isExternal
+                variant="outline"
+                className="w-full justify-center"
+                icon={<MessageCircle className="w-4 h-4" />}
+                iconPosition="left"
+              >
+                Chat WhatsApp
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </motion.article>
   );
 }
 
+function PackageDetailModal({
+  pkg,
+  imageSrc,
+  onClose,
+}: {
+  pkg: Package;
+  imageSrc: string;
+  onClose: () => void;
+}) {
+  const whatsappUrl =
+    "https://wa.me/6281286129604?text=Assalamualaikum%20saya%20mau%20tanya-tanya%20tentang%20paket%20perjalanan%20ke%20tanah%20suci";
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Detail ${pkg.name}`}
+    >
+      <div
+        className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="sticky top-3 float-right z-10 mr-3 mt-3 rounded-full bg-black/70 p-2 text-white"
+          aria-label="Tutup detail paket"
+        >
+          <X className="h-5 w-5" />
+        </button>
+
+        <img
+          src={imageSrc}
+          alt={pkg.name}
+          className="h-auto w-full object-cover"
+          loading="lazy"
+        />
+
+        <div className="space-y-4 p-5">
+          <div className="flex flex-wrap gap-2">
+            {pkg.isPopular && <Badge variant="popular">Populer</Badge>}
+            {pkg.isRecommended && <Badge variant="recommended">Recommended</Badge>}
+          </div>
+
+          <h3 className="font-serif text-2xl font-bold text-[var(--text-primary)]">{pkg.name}</h3>
+          <p className="text-sm text-[var(--text-secondary)]">{pkg.description}</p>
+
+          <div className="grid grid-cols-2 gap-3 text-sm text-[var(--text-secondary)]">
+            <p><strong>Harga:</strong> {formatPrice(pkg.price)}</p>
+            <p><strong>Durasi:</strong> {pkg.duration} hari</p>
+            <p><strong>Hotel:</strong> {pkg.hotelStars} bintang</p>
+            <p><strong>Maskapai:</strong> {pkg.airline}</p>
+            <p><strong>Berangkat:</strong> {formatDate(pkg.departureDate)}</p>
+            <p><strong>Kuota:</strong> {pkg.availableQuota}/{pkg.quota}</p>
+          </div>
+
+          <div>
+            <p className="mb-2 text-sm font-semibold text-[var(--text-primary)]">Fasilitas</p>
+            <ul className="space-y-1.5">
+              {pkg.features.map((feature, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
+                  <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-[var(--brand-green-primary)]" />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <Button
+            href={whatsappUrl}
+            isExternal
+            className="w-full justify-center"
+            icon={<ArrowRight className="h-4 w-4" />}
+          >
+            Chat via WhatsApp
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function PackageCards() {
   const { packageList } = usePackages();
+  const [selectedPackage, setSelectedPackage] = useState<{
+    pkg: Package;
+    index: number;
+  } | null>(null);
+
+  useEffect(() => {
+    function onEsc(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setSelectedPackage(null);
+      }
+    }
+
+    window.addEventListener("keydown", onEsc);
+    return () => window.removeEventListener("keydown", onEsc);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedPackage) {
+      document.body.style.overflow = "";
+      return;
+    }
+
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [selectedPackage]);
 
   return (
     <section id="packages" className="py-20 lg:py-28 bg-white">
@@ -188,7 +350,14 @@ export default function PackageCards() {
         {/* Package Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
           {packageList.map((pkg, index) => (
-            <PackageCard key={pkg.id} pkg={pkg} index={index} />
+            <PackageCard
+              key={pkg.id}
+              pkg={pkg}
+              index={index}
+              onOpen={(selectedPkg, selectedIndex) =>
+                setSelectedPackage({ pkg: selectedPkg, index: selectedIndex })
+              }
+            />
           ))}
         </div>
 
@@ -207,6 +376,14 @@ export default function PackageCards() {
             Konsultasi Gratis
           </Button>
         </motion.div>
+
+        {selectedPackage && (
+          <PackageDetailModal
+            pkg={selectedPackage.pkg}
+            imageSrc={resolveImageSrc(selectedPackage.pkg, selectedPackage.index)}
+            onClose={() => setSelectedPackage(null)}
+          />
+        )}
       </Container>
     </section>
   );
