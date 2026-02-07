@@ -45,34 +45,20 @@ export default function manifest(): MetadataRoute.Manifest {
       },
     ],
     categories: ["travel", "religion", "lifestyle"],
-    screenshots: [
-      {
-        src: "/screenshot-wide.png",
-        sizes: "1280x720",
-        type: "image/png",
-        form_factor: "wide",
-      },
-      {
-        src: "/screenshot-narrow.png",
-        sizes: "750x1334",
-        type: "image/png",
-        form_factor: "narrow",
-      },
-    ],
     shortcuts: [
       {
         name: "Lihat Paket",
         short_name: "Paket",
         description: "Lihat paket Umroh dan Haji",
         url: "/#packages",
-        icons: [{ src: "/icon-96x96.png", sizes: "96x96" }],
+        icons: [{ src: "/icon-192x192.png", sizes: "192x192", type: "image/png" }],
       },
       {
         name: "Hubungi Kami",
         short_name: "Kontak",
         description: "Hubungi kami via WhatsApp",
         url: "/#contact",
-        icons: [{ src: "/icon-96x96.png", sizes: "96x96" }],
+        icons: [{ src: "/icon-192x192.png", sizes: "192x192", type: "image/png" }],
       },
     ],
     related_applications: [],

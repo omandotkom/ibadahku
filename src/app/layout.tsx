@@ -108,12 +108,6 @@ export const metadata: Metadata = {
   category: "religion",
   classification: "Travel, Religious Services",
   referrer: "origin-when-cross-origin",
-  verification: {
-    google: "google-site-verification-code", // Ganti dengan kode verifikasi Google Search Console
-  },
-  other: {
-    "facebook-domain-verification": "facebook-verification-code", // Ganti jika ada
-  },
 };
 
 /**
@@ -141,7 +135,7 @@ function StructuredData() {
     name: "ibadahku.id",
     description: "Layanan perjalanan Umroh dan Haji dengan kualitas terbaik. Terdaftar resmi Kemenag RI.",
     url: "https://ibadahku.id",
-    logo: "https://ibadahku.id/logo.png",
+    logo: "https://ibadahku.id/logo-kabah.svg",
     image: "https://ibadahku.id/og-image.jpg",
     telephone: "+62-812-8612-9604",
     email: "info@ibadahku.id",
@@ -289,15 +283,9 @@ function OrganizationStructuredData() {
     name: "ibadahku.id",
     alternateName: "Ibadahku Travel",
     url: "https://ibadahku.id",
-    logo: "https://ibadahku.id/logo.png",
+    logo: "https://ibadahku.id/logo-kabah.svg",
     description: "Layanan perjalanan Umroh dan Haji terpercaya sejak 2009.",
     foundingDate: "2009",
-    founders: [
-      {
-        "@type": "Person",
-        name: "Founder Name",
-      },
-    ],
     contactPoint: {
       "@type": "ContactPoint",
       telephone: "+62-812-8612-9604",

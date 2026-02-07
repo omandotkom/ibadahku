@@ -9,6 +9,7 @@ import {
   Plane, 
   Check,
   ArrowRight,
+  Download,
   MessageCircle,
   X,
 } from "lucide-react";
@@ -254,12 +255,25 @@ function PackageDetailModal({
           <X className="h-5 w-5" />
         </button>
 
-        <img
-          src={imageSrc}
-          alt={pkg.name}
-          className="h-auto w-full object-cover"
-          loading="lazy"
-        />
+        <div className="relative">
+          <img
+            src={imageSrc}
+            alt={pkg.name}
+            className="h-auto w-full object-cover"
+            loading="lazy"
+          />
+          <a
+            href={imageSrc}
+            download={`${pkg.id}.jpg`}
+            target="_blank"
+            rel="noreferrer"
+            className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-md bg-black/70 px-2 py-1 text-xs font-medium text-white"
+            aria-label="Download gambar paket"
+          >
+            <Download className="h-3.5 w-3.5" />
+            Download
+          </a>
+        </div>
 
         <div className="space-y-4 p-5">
           <div className="flex flex-wrap gap-2">

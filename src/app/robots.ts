@@ -19,19 +19,12 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: [
-          "/_next/",
-          "/api/",
-          "/private/",
-          "/admin/",
-          "/*.json$",
-          "/*.xml$",
-        ],
+        disallow: ["/api/", "/private/", "/admin/"],
       },
       {
         userAgent: "Googlebot",
         allow: "/",
-        disallow: ["/_next/"],
+        disallow: ["/api/", "/admin/"],
       },
       {
         userAgent: "Googlebot-Image",

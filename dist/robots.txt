@@ -1,15 +1,13 @@
 User-Agent: *
 Allow: /
-Disallow: /_next/
 Disallow: /api/
 Disallow: /private/
 Disallow: /admin/
-Disallow: /*.json$
-Disallow: /*.xml$
 
 User-Agent: Googlebot
 Allow: /
-Disallow: /_next/
+Disallow: /api/
+Disallow: /admin/
 
 User-Agent: Googlebot-Image
 Allow: /
