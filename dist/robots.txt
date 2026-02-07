@@ -1,0 +1,18 @@
+User-Agent: *
+Allow: /
+Disallow: /_next/
+Disallow: /api/
+Disallow: /private/
+Disallow: /admin/
+Disallow: /*.json$
+Disallow: /*.xml$
+
+User-Agent: Googlebot
+Allow: /
+Disallow: /_next/
+
+User-Agent: Googlebot-Image
+Allow: /
+
+Host: https://ibadahku.id
+Sitemap: https://ibadahku.id/sitemap.xml

@@ -1,0 +1,163 @@
+﻿const JSON_HEADERS = {
+  "content-type": "application/json; charset=utf-8",
+};
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: JSON_HEADERS,
+  });
+}
+
+function validatePackage(pkg) {
+  if (!pkg || typeof pkg !== "object") {
+    return "Body package tidak valid.";
+  }
+
+  const requiredText = ["id", "name", "description", "airline", "departureDate"];
+  for (const key of requiredText) {
+    if (typeof pkg[key] !== "string" || pkg[key].trim().length === 0) {
+      return `Field ${key} wajib diisi.`;
+    }
+  }
+
+  const numberFields = ["price", "duration", "quota", "availableQuota", "hotelStars"];
+  for (const key of numberFields) {
+    if (typeof pkg[key] !== "number" || Number.isNaN(pkg[key])) {
+      return `Field ${key} harus berupa angka.`;
+    }
+  }
+
+  if (![3, 4, 5].includes(pkg.hotelStars)) {
+    return "Field hotelStars harus 3, 4, atau 5.";
+  }
+
+  if (pkg.availableQuota > pkg.quota) {
+    return "availableQuota tidak boleh lebih besar dari quota.";
+  }
+
+  if (!Array.isArray(pkg.features) || pkg.features.length === 0) {
+    return "Field features harus berupa array dan tidak boleh kosong.";
+  }
+
+  return null;
+}
+
+export async function onRequestPost(context) {
+  if (!context.env.DB) {
+    return json({ error: "D1 binding DB belum tersedia." }, 500);
+  }
+
+  let payload;
+  try {
+    payload = await context.request.json();
+  } catch {
+    return json({ error: "Body JSON tidak valid." }, 400);
+  }
+
+  const pkg = payload?.package;
+  const previousId = typeof payload?.previousId === "string" ? payload.previousId : null;
+  const validationError = validatePackage(pkg);
+  if (validationError) {
+    return json({ error: validationError }, 400);
+  }
+
+  const statements = [];
+
+  if (previousId && previousId !== pkg.id) {
+    statements.push(context.env.DB.prepare("DELETE FROM packages WHERE id = ?").bind(previousId));
+  }
+
+  statements.push(
+    context.env.DB
+      .prepare(
+        `INSERT INTO packages (
+          id,
+          name,
+          description,
+          price,
+          duration,
+          hotel_stars,
+          airline,
+          departure_date,
+          quota,
+          available_quota,
+          features,
+          is_popular,
+          is_recommended,
+          image,
+          updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(id) DO UPDATE SET
+          name = excluded.name,
+          description = excluded.description,
+          price = excluded.price,
+          duration = excluded.duration,
+          hotel_stars = excluded.hotel_stars,
+          airline = excluded.airline,
+          departure_date = excluded.departure_date,
+          quota = excluded.quota,
+          available_quota = excluded.available_quota,
+          features = excluded.features,
+          is_popular = excluded.is_popular,
+          is_recommended = excluded.is_recommended,
+          image = excluded.image,
+          updated_at = CURRENT_TIMESTAMP`,
+      )
+      .bind(
+        pkg.id.trim(),
+        pkg.name.trim(),
+        pkg.description.trim(),
+        pkg.price,
+        pkg.duration,
+        pkg.hotelStars,
+        pkg.airline.trim(),
+        pkg.departureDate,
+        pkg.quota,
+        pkg.availableQuota,
+        JSON.stringify(pkg.features.map((item) => String(item).trim()).filter(Boolean)),
+        pkg.isPopular ? 1 : 0,
+        pkg.isRecommended ? 1 : 0,
+        pkg.image ? String(pkg.image).trim() : null,
+      ),
+  );
+
+  try {
+    await context.env.DB.batch(statements);
+    return json({ ok: true, id: pkg.id });
+  } catch (error) {
+    return json(
+      {
+        error: "Gagal menyimpan paket ke D1.",
+        detail: error instanceof Error ? error.message : "Unknown error",
+      },
+      500,
+    );
+  }
+}
+
+export async function onRequestDelete(context) {
+  if (!context.env.DB) {
+    return json({ error: "D1 binding DB belum tersedia." }, 500);
+  }
+
+  const url = new URL(context.request.url);
+  const id = url.searchParams.get("id");
+
+  if (!id) {
+    return json({ error: "Query parameter id wajib diisi." }, 400);
+  }
+
+  try {
+    await context.env.DB.prepare("DELETE FROM packages WHERE id = ?").bind(id).run();
+    return json({ ok: true, id });
+  } catch (error) {
+    return json(
+      {
+        error: "Gagal menghapus paket dari D1.",
+        detail: error instanceof Error ? error.message : "Unknown error",
+      },
+      500,
+    );
+  }
+}

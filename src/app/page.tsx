@@ -1,65 +1,111 @@
-import Image from "next/image";
+/**
+ * Home Page - ibadahku.id
+ * 
+ * Main landing page for Umroh and Hajj travel service.
+ * Built with Next.js App Router and optimized for static export.
+ * 
+ * SEO Highlights:
+ * - H1: Main headline dengan keyword "Umroh" dan "Haji"
+ * - Semantic HTML structure
+ * - Internal linking strategy
+ * - Optimized images dengan alt text
+ * 
+ * @page
+ */
+
+import type { Metadata } from "next";
+import Navbar from "@/components/sections/Navbar";
+import HeroSlider from "@/components/sections/HeroSlider";
+import PackageCards from "@/components/sections/PackageCards";
+import Gallery from "@/components/sections/Gallery";
+import Features from "@/components/sections/Features";
+import Testimonials from "@/components/sections/Testimonials";
+import CTA from "@/components/sections/CTA";
+import Footer from "@/components/sections/Footer";
+
+/**
+ * Page-specific metadata
+ * Override default metadata untuk homepage
+ */
+export const metadata: Metadata = {
+  title: "ibadahku.id - Layanan Umroh & Haji Terpercaya | Travel Resmi Kemenag",
+  description: "Layanan perjalanan Umroh dan Haji dengan kualitas terbaik. Paket lengkap mulai 28jt, harga transparan, pembimbing berpengalaman. Resmi terdaftar Kemenag RI. Daftar sekarang!",
+  keywords: [
+    "umroh",
+    "haji", 
+    "travel umroh",
+    "paket umroh",
+    "paket umroh 2024",
+    "biro perjalanan haji umroh",
+    "travel haji",
+    "umroh murah",
+    "umroh plus",
+    "umroh vip",
+  ],
+  alternates: {
+    canonical: "https://ibadahku.id/",
+  },
+  openGraph: {
+    title: "ibadahku.id - Layanan Umroh & Haji Terpercaya",
+    description: "Layanan perjalanan Umroh dan Haji dengan kualitas terbaik. Resmi terdaftar Kemenag RI.",
+    url: "https://ibadahku.id/",
+    type: "website",
+  },
+};
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="min-h-screen">
+      {/* Skip to main content link untuk accessibility */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[var(--brand-green-primary)] focus:text-white focus:rounded-lg"
+      >
+        Lompat ke konten utama
+      </a>
+
+      {/* Navigation */}
+      <header role="banner">
+        <Navbar />
+      </header>
+      
+      {/* Main Content */}
+      <div id="main-content">
+        {/* Hero Slider Section */}
+        <section aria-label="Beranda">
+          <HeroSlider />
+        </section>
+        
+        {/* Package Offerings */}
+        <section aria-labelledby="packages-heading">
+          <PackageCards />
+        </section>
+        
+        {/* Gallery */}
+        <section aria-label="Galeri Foto dan Video">
+          <Gallery />
+        </section>
+        
+        {/* Features & Why Choose Us */}
+        <section aria-labelledby="features-heading">
+          <Features />
+        </section>
+        
+        {/* Customer Testimonials */}
+        <section aria-labelledby="testimonials-heading">
+          <Testimonials />
+        </section>
+        
+        {/* Call to Action */}
+        <section aria-label="Hubungi Kami">
+          <CTA />
+        </section>
+      </div>
+      
+      {/* Footer */}
+      <footer role="contentinfo">
+        <Footer />
+      </footer>
+    </main>
   );
 }
