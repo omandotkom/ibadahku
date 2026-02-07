@@ -244,7 +244,8 @@ export default function AdminPackagesPage() {
   }
 
   async function handleUploadImage() {
-    if (!selectedImageFile) {
+    const fileToUpload = selectedImageFile;
+    if (!fileToUpload) {
       setMessage("Pilih file gambar terlebih dahulu.");
       return;
     }
@@ -253,7 +254,7 @@ export default function AdminPackagesPage() {
 
     try {
       const formData = new FormData();
-      formData.append("file", selectedImageFile);
+      formData.append("file", fileToUpload);
 
       const response = await fetch("/api/admin/upload-image", {
         method: "POST",
@@ -616,7 +617,45 @@ export default function AdminPackagesPage() {
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
-                    onChange={(e) => setSelectedImageFile(e.target.files?.[0] ?? null)}
+                    onChange={(e) => {
+                      const nextFile = e.target.files?.[0] ?? null;
+                      setSelectedImageFile(nextFile);
+                      if (nextFile) {
+                        void (async () => {
+                          setIsUploadingImage(true);
+                          try {
+                            const formData = new FormData();
+                            formData.append("file", nextFile);
+
+                            const response = await fetch("/api/admin/upload-image", {
+                              method: "POST",
+                              body: formData,
+                            });
+
+                            const payload = (await response.json().catch(() => null)) as
+                              | { url?: string; error?: string }
+                              | null;
+
+                            if (!response.ok || !payload?.url) {
+                              throw new Error(
+                                payload?.error ??
+                                  `POST /api/admin/upload-image gagal (${response.status})`,
+                              );
+                            }
+
+                            updateField("image", payload.url);
+                            setSelectedImageFile(null);
+                            setMessage("Gambar berhasil diupload ke R2.");
+                          } catch (uploadError) {
+                            const detail =
+                              uploadError instanceof Error ? uploadError.message : "Unknown error";
+                            setMessage(`Upload gambar gagal. Detail: ${normalizeApiError(detail)}`);
+                          } finally {
+                            setIsUploadingImage(false);
+                          }
+                        })();
+                      }
+                    }}
                     className="max-w-full text-xs text-[var(--text-secondary)]"
                   />
                   <button
@@ -628,6 +667,16 @@ export default function AdminPackagesPage() {
                     {isUploadingImage ? "Uploading..." : "Upload ke R2"}
                   </button>
                 </div>
+                {form.image && (
+                  <div className="mt-3 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-2">
+                    <p className="mb-2 text-xs text-[var(--text-secondary)]">Preview thumbnail:</p>
+                    <img
+                      src={form.image}
+                      alt="Preview gambar paket"
+                      className="h-28 w-28 rounded-lg object-cover"
+                    />
+                  </div>
+                )}
               </label>
 
               <label className="space-y-1 text-sm md:col-span-2">
