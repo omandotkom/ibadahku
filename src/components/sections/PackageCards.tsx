@@ -105,7 +105,7 @@ function PackageCard({
       tabIndex={0}
     >
       {/* Card Image */}
-      <div className="relative aspect-video overflow-hidden">
+      <div className="relative aspect-[2/3] overflow-hidden">
         {/* Badge Positioning */}
         <div className="absolute top-4 left-4 z-10 flex flex-wrap gap-2">
           {pkg.isPopular && <Badge variant="popular">Populer</Badge>}
