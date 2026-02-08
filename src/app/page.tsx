@@ -30,7 +30,7 @@ import Footer from "@/components/sections/Footer";
  */
 export const metadata: Metadata = {
   title: "ibadahku.id - Layanan Umroh & Haji Terpercaya | Travel Resmi Kemenag",
-  description: "Layanan perjalanan Umroh dan Haji dengan kualitas terbaik. Paket lengkap mulai 28jt, harga transparan, pembimbing berpengalaman. Resmi terdaftar Kemenag RI. Daftar sekarang!",
+  description: "Layanan perjalanan Umroh dan Haji dengan kualitas terbaik. Paket lengkap mulai 23jt, harga transparan, pembimbing berpengalaman. Resmi terdaftar Kemenag RI. Daftar sekarang!",
   keywords: [
     "umroh",
     "haji", 
