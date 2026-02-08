@@ -174,7 +174,7 @@ export default function Footer() {
               <a href="#" className="hover:text-white transition-colors">
                 Kebijakan Privasi
               </a>
-              <a href="#" className="hover:text-white transition-colors">
+              <a href="/syarat-ketentuan" className="hover:text-white transition-colors">
                 Syarat & Ketentuan
               </a>
               <a href="#" className="hover:text-white transition-colors">

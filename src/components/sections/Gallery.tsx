@@ -28,6 +28,14 @@ type GalleryItem = {
 
 const galleryItems: GalleryItem[] = [
   {
+    id: 1000,
+    src: "/assets/gallery/IMG_4291.mp4",
+    alt: "Video dokumentasi jamaah terbaru",
+    caption: "Dokumentasi Jamaah Terbaru",
+    category: "Video",
+    type: "video",
+  },
+  {
     id: 1001,
     src: "/assets/gallery/wa-video-2026-02-07-173339.mp4",
     alt: "Video dokumentasi jamaah 1",

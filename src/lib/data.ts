@@ -15,7 +15,7 @@ export const siteConfig: SiteConfig = {
   contact: {
     phone: "+62 812-8612-9604",
     email: "info@ibadahku.id",
-    address: "Jl. KH. Ahmad Dahlan No. 123, Jakarta Selatan",
+    address: "(Agen Konsultasi) Perumahan Telaga Harapan Blok D 9 No 4 RT 006 RW 12 desa Telaga Murni kecamatan Cikarang Barat Kabupaten Bekasi",
     whatsapp: "6281286129604",
   },
   social: [
