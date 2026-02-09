@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
+import { BackgroundAudio } from "@/components/BackgroundAudio";
 
 /**
  * Playfair Display - Serif font for headings
@@ -340,6 +341,7 @@ export default function RootLayout({
         <OrganizationStructuredData />
       </head>
       <body className="font-sans antialiased min-h-screen">
+        <BackgroundAudio />
         {children}
       </body>
     </html>
