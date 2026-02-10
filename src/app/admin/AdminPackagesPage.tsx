@@ -228,6 +228,7 @@ export default function AdminPackagesPage() {
   const [message, setMessage] = useState<string>("");
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [selectedImagePreviewUrl, setSelectedImagePreviewUrl] = useState<string>("");
 
   const isEditing = editingId !== null && packageList.some((item) => item.id === editingId);
   const numericPrice = Number(form.price || 0);
@@ -299,6 +300,20 @@ export default function AdminPackagesPage() {
     void loadFromServer(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!selectedImageFile) {
+      setSelectedImagePreviewUrl("");
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(selectedImageFile);
+    setSelectedImagePreviewUrl(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [selectedImageFile]);
 
   function updateField<K extends keyof PackageForm>(field: K, value: PackageForm[K]) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -713,12 +728,7 @@ export default function AdminPackagesPage() {
               </label>
 
               <label className="space-y-1 text-sm md:col-span-2">
-                <span className="text-[var(--text-secondary)]">Image Path (opsional)</span>
-                <input
-                  className={inputClass}
-                  value={form.image}
-                  onChange={(e) => updateField("image", e.target.value)}
-                />
+                <span className="text-[var(--text-secondary)]">Gambar Paket (opsional)</span>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <input
                     ref={imageFileInputRef}
@@ -744,13 +754,13 @@ export default function AdminPackagesPage() {
                 <p className="text-xs text-[var(--text-muted)]">
                   File diupload ke R2 saat klik Simpan Perubahan/Tambah Paket.
                 </p>
-                {form.image && (
+                {(selectedImagePreviewUrl || form.image) && (
                   <div className="mt-3 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-2">
                     <p className="mb-2 text-xs text-[var(--text-secondary)]">Preview thumbnail:</p>
                     <img
-                      src={form.image}
+                      src={selectedImagePreviewUrl || form.image}
                       alt="Preview gambar paket"
-                      className="h-28 w-28 rounded-lg object-cover"
+                      className="h-44 w-full rounded-lg object-cover sm:h-56"
                     />
                   </div>
                 )}
