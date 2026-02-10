@@ -424,10 +424,15 @@ export default function AdminPackagesPage() {
       if (imageFileInputRef.current) {
         imageFileInputRef.current.value = "";
       }
-      const actionMessage = isEditing
-        ? "Paket berhasil diperbarui di server."
-        : "Paket baru berhasil ditambahkan ke server.";
-      setMessage(selectedImageFile ? `${actionMessage} Gambar juga berhasil diupload ke R2.` : actionMessage);
+      setEditingId(null);
+      setForm(createNewPackageForm([...packageList, packageToSave]));
+      setMessage("");
+      scrollToFormCard();
+
+      const popupMessage = selectedImageFile
+        ? "Data paket berhasil disimpan. Gambar juga berhasil diupload ke R2."
+        : "Data paket berhasil disimpan.";
+      window.alert(popupMessage);
     } catch (saveError) {
       const detail = saveError instanceof Error ? saveError.message : "Unknown error";
       const nextList = isEditing && editingId
