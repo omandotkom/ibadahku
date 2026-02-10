@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Package } from "@/types";
 import { packages as defaultPackages } from "@/lib/data";
 import { formatPrice } from "@/lib/utils";
@@ -29,6 +29,27 @@ type InitialState = {
   form: PackageForm;
 };
 
+function generatePackageId(existingIds: string[]): string {
+  const existing = new Set(existingIds);
+
+  while (true) {
+    const timestamp = new Date().toISOString().replace(/\D/g, "").slice(0, 14);
+    const randomSuffix = Math.random().toString(36).slice(2, 8);
+    const candidate = `pkg-${timestamp}-${randomSuffix}`;
+
+    if (!existing.has(candidate)) {
+      return candidate;
+    }
+  }
+}
+
+function createNewPackageForm(existingPackages: Package[]): PackageForm {
+  return {
+    ...toForm(),
+    id: generatePackageId(existingPackages.map((item) => item.id)),
+  };
+}
+
 function toForm(pkg?: Package): PackageForm {
   return {
     id: pkg?.id ?? "",
@@ -40,8 +61,8 @@ function toForm(pkg?: Package): PackageForm {
     airline: pkg?.airline ?? "",
     departureDate: pkg?.departureDate ?? "",
     featuresText: pkg?.features.join("\n") ?? "",
-    isPopular: pkg?.isPopular ?? false,
-    isRecommended: pkg?.isRecommended ?? false,
+    isPopular: true,
+    isRecommended: true,
     image: pkg?.image ?? "",
   };
 }
@@ -62,8 +83,8 @@ function toPackage(form: PackageForm): Package {
     airline: form.airline.trim(),
     departureDate: form.departureDate,
     features,
-    isPopular: form.isPopular,
-    isRecommended: form.isRecommended,
+    isPopular: true,
+    isRecommended: true,
     image: form.image.trim() || undefined,
   };
 }
@@ -129,7 +150,77 @@ function normalizeApiError(message: string): string {
   return message;
 }
 
+function toIndonesianWords(value: number): string {
+  const words = [
+    "",
+    "satu",
+    "dua",
+    "tiga",
+    "empat",
+    "lima",
+    "enam",
+    "tujuh",
+    "delapan",
+    "sembilan",
+    "sepuluh",
+    "sebelas",
+  ];
+
+  if (value < 12) {
+    return words[value];
+  }
+
+  if (value < 20) {
+    return `${toIndonesianWords(value - 10)} belas`;
+  }
+
+  if (value < 100) {
+    const tens = Math.floor(value / 10);
+    const remainder = value % 10;
+    return `${toIndonesianWords(tens)} puluh${remainder ? ` ${toIndonesianWords(remainder)}` : ""}`;
+  }
+
+  if (value < 200) {
+    return `seratus${value % 100 ? ` ${toIndonesianWords(value - 100)}` : ""}`;
+  }
+
+  if (value < 1000) {
+    const hundreds = Math.floor(value / 100);
+    const remainder = value % 100;
+    return `${toIndonesianWords(hundreds)} ratus${remainder ? ` ${toIndonesianWords(remainder)}` : ""}`;
+  }
+
+  if (value < 2000) {
+    return `seribu${value % 1000 ? ` ${toIndonesianWords(value - 1000)}` : ""}`;
+  }
+
+  if (value < 1_000_000) {
+    const thousands = Math.floor(value / 1000);
+    const remainder = value % 1000;
+    return `${toIndonesianWords(thousands)} ribu${remainder ? ` ${toIndonesianWords(remainder)}` : ""}`;
+  }
+
+  if (value < 1_000_000_000) {
+    const millions = Math.floor(value / 1_000_000);
+    const remainder = value % 1_000_000;
+    return `${toIndonesianWords(millions)} juta${remainder ? ` ${toIndonesianWords(remainder)}` : ""}`;
+  }
+
+  if (value < 1_000_000_000_000) {
+    const billions = Math.floor(value / 1_000_000_000);
+    const remainder = value % 1_000_000_000;
+    return `${toIndonesianWords(billions)} miliar${remainder ? ` ${toIndonesianWords(remainder)}` : ""}`;
+  }
+
+  const trillions = Math.floor(value / 1_000_000_000_000);
+  const remainder = value % 1_000_000_000_000;
+  return `${toIndonesianWords(trillions)} triliun${remainder ? ` ${toIndonesianWords(remainder)}` : ""}`;
+}
+
 export default function AdminPackagesPage() {
+  const formCardRef = useRef<HTMLFormElement>(null);
+  const packageNameInputRef = useRef<HTMLInputElement>(null);
+  const imageFileInputRef = useRef<HTMLInputElement>(null);
   const [initial] = useState<InitialState>(() => getInitialState());
   const [packageList, setPackageList] = useState<Package[]>(initial.list);
   const [form, setForm] = useState<PackageForm>(initial.form);
@@ -137,9 +228,29 @@ export default function AdminPackagesPage() {
   const [message, setMessage] = useState<string>("");
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
-  const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false);
 
   const isEditing = editingId !== null && packageList.some((item) => item.id === editingId);
+  const numericPrice = Number(form.price || 0);
+  const priceInWords =
+    form.price.length === 0
+      ? "-"
+      : `${toIndonesianWords(numericPrice).replace(/\s+/g, " ").trim() || "nol"} rupiah`;
+
+  function scrollToFormCard() {
+    const formEl = formCardRef.current;
+    if (formEl) {
+      const viewportOffset = 20;
+      const targetTop = formEl.getBoundingClientRect().top + window.scrollY - viewportOffset;
+      window.scrollTo({
+        top: Math.max(targetTop, 0),
+        behavior: "smooth",
+      });
+    }
+
+    window.setTimeout(() => {
+      packageNameInputRef.current?.focus();
+    }, 250);
+  }
 
   function persist(nextList: Package[]) {
     if (typeof window !== "undefined") {
@@ -153,7 +264,7 @@ export default function AdminPackagesPage() {
 
     if (nextList.length === 0) {
       setEditingId(null);
-      setForm(toForm());
+      setForm(createNewPackageForm(nextList));
       return;
     }
 
@@ -196,14 +307,23 @@ export default function AdminPackagesPage() {
   function handleSelectPackage(pkg: Package) {
     setEditingId(pkg.id);
     setForm(toForm(pkg));
+    setSelectedImageFile(null);
+    if (imageFileInputRef.current) {
+      imageFileInputRef.current.value = "";
+    }
     setMessage("");
+    scrollToFormCard();
   }
 
   function handleNewPackage() {
     setEditingId(null);
-    setForm(toForm());
+    setForm(createNewPackageForm(packageList));
     setSelectedImageFile(null);
+    if (imageFileInputRef.current) {
+      imageFileInputRef.current.value = "";
+    }
     setMessage("Mode tambah paket baru aktif.");
+    scrollToFormCard();
   }
 
   function validateForm(pkg: Package): string | null {
@@ -237,41 +357,28 @@ export default function AdminPackagesPage() {
     }
   }
 
-  async function handleUploadImage() {
-    const fileToUpload = selectedImageFile;
-    if (!fileToUpload) {
-      setMessage("Pilih file gambar terlebih dahulu.");
-      return;
+  async function uploadImageToR2(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("/api/admin/upload-image", {
+      method: "POST",
+      body: formData,
+    });
+
+    const payload = (await response.json().catch(() => null)) as
+      | { url?: string; error?: string }
+      | null;
+
+    if (!response.ok || !payload?.url) {
+      throw new Error(payload?.error ?? `POST /api/admin/upload-image gagal (${response.status})`);
     }
 
-    setIsUploadingImage(true);
+    return payload.url;
+  }
 
-    try {
-      const formData = new FormData();
-      formData.append("file", fileToUpload);
-
-      const response = await fetch("/api/admin/upload-image", {
-        method: "POST",
-        body: formData,
-      });
-
-      const payload = (await response.json().catch(() => null)) as
-        | { url?: string; error?: string }
-        | null;
-
-      if (!response.ok || !payload?.url) {
-        throw new Error(payload?.error ?? `POST /api/admin/upload-image gagal (${response.status})`);
-      }
-
-      updateField("image", payload.url);
-      setSelectedImageFile(null);
-      setMessage("Gambar berhasil diupload ke R2.");
-    } catch (uploadError) {
-      const detail = uploadError instanceof Error ? uploadError.message : "Unknown error";
-      setMessage(`Upload gambar gagal. Detail: ${normalizeApiError(detail)}`);
-    } finally {
-      setIsUploadingImage(false);
-    }
+  function handlePickImageFile() {
+    imageFileInputRef.current?.click();
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -287,9 +394,25 @@ export default function AdminPackagesPage() {
     setIsSyncing(true);
 
     try {
-      await upsertServerPackage(normalizedPackage, isEditing ? editingId : null);
+      let packageToSave = normalizedPackage;
+      if (selectedImageFile) {
+        const uploadedImageUrl = await uploadImageToR2(selectedImageFile);
+        packageToSave = {
+          ...normalizedPackage,
+          image: uploadedImageUrl,
+        };
+      }
+
+      await upsertServerPackage(packageToSave, isEditing ? editingId : null);
       await loadFromServer(false);
-      setMessage(isEditing ? "Paket berhasil diperbarui di server." : "Paket baru berhasil ditambahkan ke server.");
+      setSelectedImageFile(null);
+      if (imageFileInputRef.current) {
+        imageFileInputRef.current.value = "";
+      }
+      const actionMessage = isEditing
+        ? "Paket berhasil diperbarui di server."
+        : "Paket baru berhasil ditambahkan ke server.";
+      setMessage(selectedImageFile ? `${actionMessage} Gambar juga berhasil diupload ke R2.` : actionMessage);
     } catch (saveError) {
       const detail = saveError instanceof Error ? saveError.message : "Unknown error";
       const nextList = isEditing && editingId
@@ -352,6 +475,10 @@ export default function AdminPackagesPage() {
 
     const nextList = [...defaultPackages];
     applyList(nextList);
+    setSelectedImageFile(null);
+    if (imageFileInputRef.current) {
+      imageFileInputRef.current.value = "";
+    }
     setMessage("Data lokal dikembalikan ke default. Gunakan simpan per item untuk kirim ke server.");
   }
 
@@ -469,6 +596,7 @@ export default function AdminPackagesPage() {
           </div>
 
           <form
+            ref={formCardRef}
             onSubmit={(event) => void handleSubmit(event)}
             className="space-y-4 rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm"
           >
@@ -492,14 +620,18 @@ export default function AdminPackagesPage() {
                 <input
                   className={inputClass}
                   value={form.id}
-                  onChange={(e) => updateField("id", e.target.value)}
-                  required
+                  disabled
+                  readOnly
                 />
+                <p className="text-xs text-[var(--text-muted)]">
+                  ID dibuat otomatis oleh sistem.
+                </p>
               </label>
 
               <label className="space-y-1 text-sm">
                 <span className="text-[var(--text-secondary)]">Nama Paket</span>
                 <input
+                  ref={packageNameInputRef}
                   className={inputClass}
                   value={form.name}
                   onChange={(e) => updateField("name", e.target.value)}
@@ -519,15 +651,19 @@ export default function AdminPackagesPage() {
               </label>
 
               <label className="space-y-1 text-sm">
-                <span className="text-[var(--text-secondary)]">Harga (IDR)</span>
+                <span className="text-[var(--text-secondary)]">Harga (Mulai dari, IDR)</span>
                 <input
-                  type="number"
-                  min={0}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   className={inputClass}
                   value={form.price}
-                  onChange={(e) => updateField("price", e.target.value)}
+                  onChange={(e) => updateField("price", e.target.value.replace(/\D/g, ""))}
                   required
                 />
+                <p className="text-xs text-[var(--text-muted)]">
+                  Terbilang: {priceInWords}
+                </p>
               </label>
 
               <label className="space-y-1 text-sm">
@@ -585,58 +721,29 @@ export default function AdminPackagesPage() {
                 />
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <input
+                    ref={imageFileInputRef}
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
-                    onChange={(e) => {
-                      const nextFile = e.target.files?.[0] ?? null;
-                      setSelectedImageFile(nextFile);
-                      if (nextFile) {
-                        void (async () => {
-                          setIsUploadingImage(true);
-                          try {
-                            const formData = new FormData();
-                            formData.append("file", nextFile);
-
-                            const response = await fetch("/api/admin/upload-image", {
-                              method: "POST",
-                              body: formData,
-                            });
-
-                            const payload = (await response.json().catch(() => null)) as
-                              | { url?: string; error?: string }
-                              | null;
-
-                            if (!response.ok || !payload?.url) {
-                              throw new Error(
-                                payload?.error ??
-                                  `POST /api/admin/upload-image gagal (${response.status})`,
-                              );
-                            }
-
-                            updateField("image", payload.url);
-                            setSelectedImageFile(null);
-                            setMessage("Gambar berhasil diupload ke R2.");
-                          } catch (uploadError) {
-                            const detail =
-                              uploadError instanceof Error ? uploadError.message : "Unknown error";
-                            setMessage(`Upload gambar gagal. Detail: ${normalizeApiError(detail)}`);
-                          } finally {
-                            setIsUploadingImage(false);
-                          }
-                        })();
-                      }
-                    }}
-                    className="max-w-full text-xs text-[var(--text-secondary)]"
+                    onChange={(e) => setSelectedImageFile(e.target.files?.[0] ?? null)}
+                    className="hidden"
                   />
                   <button
                     type="button"
-                    onClick={() => void handleUploadImage()}
-                    disabled={!selectedImageFile || isUploadingImage}
+                    onClick={handlePickImageFile}
+                    disabled={isSyncing}
                     className="rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-medium text-[var(--text-primary)] disabled:opacity-50"
                   >
-                    {isUploadingImage ? "Uploading..." : "Upload ke R2"}
+                    Pilih File
                   </button>
+                  {selectedImageFile && (
+                    <p className="text-xs text-[var(--text-secondary)]">
+                      File dipilih: {selectedImageFile.name}
+                    </p>
+                  )}
                 </div>
+                <p className="text-xs text-[var(--text-muted)]">
+                  File diupload ke R2 saat klik Simpan Perubahan/Tambah Paket.
+                </p>
                 {form.image && (
                   <div className="mt-3 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-2">
                     <p className="mb-2 text-xs text-[var(--text-secondary)]">Preview thumbnail:</p>
@@ -665,8 +772,8 @@ export default function AdminPackagesPage() {
               <label className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)]">
                 <input
                   type="checkbox"
-                  checked={form.isPopular}
-                  onChange={(e) => updateField("isPopular", e.target.checked)}
+                  checked
+                  disabled
                 />
                 Popular
               </label>
@@ -674,8 +781,8 @@ export default function AdminPackagesPage() {
               <label className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)]">
                 <input
                   type="checkbox"
-                  checked={form.isRecommended}
-                  onChange={(e) => updateField("isRecommended", e.target.checked)}
+                  checked
+                  disabled
                 />
                 Recommended
               </label>
@@ -691,7 +798,25 @@ export default function AdminPackagesPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setForm(toForm())}
+                onClick={() => {
+                  if (isEditing) {
+                    const current = packageList.find((item) => item.id === editingId);
+                    setForm(toForm(current));
+                    setSelectedImageFile(null);
+                    if (imageFileInputRef.current) {
+                      imageFileInputRef.current.value = "";
+                    }
+                    setMessage("Form dikembalikan ke data paket terpilih.");
+                    return;
+                  }
+
+                  setForm(createNewPackageForm(packageList));
+                  setSelectedImageFile(null);
+                  if (imageFileInputRef.current) {
+                    imageFileInputRef.current.value = "";
+                  }
+                  setMessage("Form paket baru dikosongkan. ID baru sudah dibuat otomatis.");
+                }}
                 className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm font-medium text-[var(--text-primary)]"
               >
                 Kosongkan Form

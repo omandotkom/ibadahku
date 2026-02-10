@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Volume2, VolumeX, Play } from "lucide-react";
 
 /**
@@ -9,6 +10,8 @@ import { Volume2, VolumeX, Play } from "lucide-react";
  * Handles browser autoplay restrictions gracefully
  */
 export function BackgroundAudio() {
+  const pathname = usePathname();
+  const isAdminRoute = pathname?.startsWith("/admin");
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -16,6 +19,10 @@ export function BackgroundAudio() {
   const [showControl, setShowControl] = useState(false);
 
   useEffect(() => {
+    if (isAdminRoute) {
+      return;
+    }
+
     const audio = audioRef.current;
     if (!audio) return;
 
@@ -92,7 +99,7 @@ export function BackgroundAudio() {
       document.removeEventListener("touchstart", handleFirstInteraction);
       document.removeEventListener("scroll", handleFirstInteraction);
     };
-  }, [hasError]);
+  }, [hasError, isAdminRoute]);
 
   const togglePlay = () => {
     const audio = audioRef.current;
@@ -112,6 +119,10 @@ export function BackgroundAudio() {
     audio.muted = !isMuted;
     setIsMuted(!isMuted);
   };
+
+  if (isAdminRoute) {
+    return null;
+  }
 
   return (
     <>
