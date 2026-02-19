@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { 
   MapPin, 
   Phone, 
@@ -47,14 +48,14 @@ export default function Footer() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
             {/* Brand Column */}
             <div className="lg:col-span-1">
-              <a href="/" className="flex items-center gap-2 mb-6">
+              <Link href="/" className="flex items-center gap-2 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--brand-green-light)] to-[var(--brand-green-primary)] flex items-center justify-center">
                   <span className="text-white font-serif font-bold text-lg">i</span>
                 </div>
                 <span className="font-serif font-bold text-xl">
                   ibadahku<span className="text-[var(--accent-gold)]">.id</span>
                 </span>
-              </a>
+              </Link>
               <p className="text-white/70 text-sm leading-relaxed mb-6">
                 Layanan perjalanan Umroh dan Haji terpercaya dengan pengalaman lebih dari 15 tahun. 
                 Mewujudkan impian ibadah Anda ke Tanah Suci.
@@ -86,13 +87,13 @@ export default function Footer() {
               <ul className="space-y-3">
                 {navItems.slice(0, 4).map((item) => (
                   <li key={item.href}>
-                    <a
+                    <Link
                       href={item.href}
                       className="text-white/70 hover:text-white transition-colors text-sm inline-flex items-center gap-1 group"
                     >
                       {item.label}
                       <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -171,15 +172,15 @@ export default function Footer() {
               {currentYear} ibadahku.id. Hak Cipta Dilindungi.
             </p>
             <div className="flex items-center gap-6 text-sm text-white/60">
-              <a href="#" className="hover:text-white transition-colors">
+              <Link href="#" className="hover:text-white transition-colors">
                 Kebijakan Privasi
-              </a>
-              <a href="/syarat-ketentuan" className="hover:text-white transition-colors">
+              </Link>
+              <Link href="/syarat-ketentuan" className="hover:text-white transition-colors">
                 Syarat & Ketentuan
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
+              </Link>
+              <Link href="#" className="hover:text-white transition-colors">
                 FAQ
-              </a>
+              </Link>
             </div>
           </div>
         </Container>
