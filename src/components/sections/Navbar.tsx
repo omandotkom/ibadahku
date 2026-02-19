@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Phone } from "lucide-react";
+import Link from "next/link";
 import { navItems, siteConfig } from "@/lib/data";
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
@@ -76,7 +77,7 @@ export default function Navbar() {
         <Container>
           <nav className="flex items-center justify-between">
             {/* Logo */}
-            <a 
+            <Link
               href="/" 
               className="flex items-center gap-2 group"
               aria-label="ibadahku.id - Beranda"
@@ -92,12 +93,12 @@ export default function Navbar() {
                   .id
                 </span>
               </div>
-            </a>
+            </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-8">
               {navItems.map((item) => (
-                <a
+                <Link
                   key={item.href}
                   href={item.href}
                   className={`
@@ -108,7 +109,7 @@ export default function Navbar() {
                   `}
                 >
                   {item.label}
-                </a>
+                </Link>
               ))}
             </div>
 
@@ -182,14 +183,14 @@ export default function Navbar() {
               <div className="flex flex-col h-full">
                 {/* Mobile Header */}
                 <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
-                  <a href="/" className="flex items-center gap-2">
+                  <Link href="/" className="flex items-center gap-2">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--brand-green-dark)] to-[var(--brand-green-primary)] flex items-center justify-center">
                       <span className="text-white font-serif font-bold text-lg">i</span>
                     </div>
                     <span className="font-serif font-bold text-xl text-[var(--brand-green-dark)]">
                       ibadahku<span className="text-[var(--accent-gold)]">.id</span>
                     </span>
-                  </a>
+                  </Link>
                   <button
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="p-2 rounded-xl hover:bg-[var(--surface-elevated)] min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -209,7 +210,7 @@ export default function Navbar() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05 + 0.1 }}
                       >
-                        <a
+                        <Link
                           href={item.href}
                           onClick={() => setIsMobileMenuOpen(false)}
                           className="
@@ -220,7 +221,7 @@ export default function Navbar() {
                           "
                         >
                           {item.label}
-                        </a>
+                        </Link>
                       </motion.li>
                     ))}
                   </ul>

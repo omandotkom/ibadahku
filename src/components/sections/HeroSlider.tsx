@@ -146,7 +146,7 @@ export default function HeroSlider() {
             className="font-sans text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6 tracking-tight"
             style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
           >
-            Selamat Datang
+            Travel Umroh & Haji Terpercaya
           </motion.h1>
 
           {/* Subtitle */}
@@ -156,7 +156,7 @@ export default function HeroSlider() {
             transition={{ delay: 0.7, duration: 0.6 }}
             className="text-xl sm:text-2xl md:text-3xl text-white/90 font-light mb-4"
           >
-            di <span className="font-semibold text-[var(--accent-gold)]">ibadahku.id</span>
+            Bersama <span className="font-semibold text-[var(--accent-gold)]">ibadahku.id</span>
           </motion.p>
 
           {/* Description */}
@@ -167,7 +167,7 @@ export default function HeroSlider() {
             className="text-base sm:text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed"
           >
             Mari wujudkan impian ibadah Anda ke Tanah Suci bersama kami. 
-            Layanan Umroh & Haji terpercaya dengan pembimbing berpengalaman.
+            Sebagai biro perjalanan haji dan umroh resmi yang terdaftar di Kemenag RI, kami berkomitmen memberikan layanan terbaik dengan harga transparan dan pembimbing berpengalaman. Dapatkan paket umroh murah dan berkualitas tahun 2026 sekarang juga.
           </motion.p>
 
           {/* CTA Buttons */}

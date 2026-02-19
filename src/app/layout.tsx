@@ -101,9 +101,9 @@ export const metadata: Metadata = {
     creator: "@ibadahku.id",
   },
   alternates: {
-    canonical: "https://ibadahku.id",
+    canonical: "https://ibadahku.id/",
     languages: {
-      "id-ID": "https://ibadahku.id",
+      "id-ID": "https://ibadahku.id/",
     },
   },
   category: "religion",
