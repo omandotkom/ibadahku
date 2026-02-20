@@ -19,6 +19,18 @@ function sanitizeFileName(name) {
     .replace(/^-|-$/g, "");
 }
 
+function rowToGalleryItem(row) {
+  return {
+    id: String(row.id),
+    src: String(row.src),
+    alt: String(row.alt),
+    caption: String(row.caption),
+    category: String(row.category),
+    type: String(row.type),
+    created_at: String(row.created_at),
+  };
+}
+
 function rowToPackage(row) {
   let features = [];
   try {
@@ -76,6 +88,25 @@ function validatePackage(pkg) {
   return null;
 }
 
+function validateGalleryItem(item) {
+  if (!item || typeof item !== "object") {
+    return "Body gallery item tidak valid.";
+  }
+
+  const requiredText = ["id", "src", "alt", "caption", "category", "type"];
+  for (const key of requiredText) {
+    if (typeof item[key] !== "string" || item[key].trim().length === 0) {
+      return `Field ${key} wajib diisi.`;
+    }
+  }
+
+  if (!["image", "video"].includes(item.type)) {
+    return "Field type harus 'image' atau 'video'.";
+  }
+
+  return null;
+}
+
 async function handleGetPackages(env) {
   if (!env.DB) {
     return json({ error: "D1 binding DB belum tersedia." }, 500);
@@ -108,6 +139,38 @@ async function handleGetPackages(env) {
     return json(
       {
         error: "Gagal mengambil data paket dari D1.",
+        detail: error instanceof Error ? error.message : "Unknown error",
+      },
+      500,
+    );
+  }
+}
+
+async function handleGetGallery(env) {
+  if (!env.DB) {
+    return json({ error: "D1 binding DB belum tersedia." }, 500);
+  }
+
+  try {
+    const result = await env.DB.prepare(
+      `SELECT
+        id,
+        src,
+        alt,
+        caption,
+        category,
+        type,
+        created_at
+      FROM gallery
+      ORDER BY created_at DESC`,
+    ).all();
+
+    const rows = Array.isArray(result.results) ? result.results : [];
+    return json({ data: rows.map(rowToGalleryItem) });
+  } catch (error) {
+    return json(
+      {
+        error: "Gagal mengambil data gallery dari D1.",
         detail: error instanceof Error ? error.message : "Unknown error",
       },
       500,
@@ -208,6 +271,64 @@ async function handleUpsertPackage(request, env) {
   }
 }
 
+async function handleUpsertGallery(request, env) {
+  if (!env.DB) {
+    return json({ error: "D1 binding DB belum tersedia." }, 500);
+  }
+
+  let payload;
+  try {
+    payload = await request.json();
+  } catch {
+    return json({ error: "Body JSON tidak valid." }, 400);
+  }
+
+  const item = payload?.item;
+  const validationError = validateGalleryItem(item);
+  if (validationError) {
+    return json({ error: validationError }, 400);
+  }
+
+  try {
+    await env.DB.prepare(
+      `INSERT INTO gallery (
+        id,
+        src,
+        alt,
+        caption,
+        category,
+        type,
+        created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      ON CONFLICT(id) DO UPDATE SET
+        src = excluded.src,
+        alt = excluded.alt,
+        caption = excluded.caption,
+        category = excluded.category,
+        type = excluded.type`,
+    )
+      .bind(
+        item.id.trim(),
+        item.src.trim(),
+        item.alt.trim(),
+        item.caption.trim(),
+        item.category.trim(),
+        item.type.trim()
+      )
+      .run();
+
+    return json({ ok: true, id: item.id });
+  } catch (error) {
+    return json(
+      {
+        error: "Gagal menyimpan gallery item ke D1.",
+        detail: error instanceof Error ? error.message : "Unknown error",
+      },
+      500,
+    );
+  }
+}
+
 async function handleDeletePackage(request, env) {
   if (!env.DB) {
     return json({ error: "D1 binding DB belum tersedia." }, 500);
@@ -227,6 +348,32 @@ async function handleDeletePackage(request, env) {
     return json(
       {
         error: "Gagal menghapus paket dari D1.",
+        detail: error instanceof Error ? error.message : "Unknown error",
+      },
+      500,
+    );
+  }
+}
+
+async function handleDeleteGallery(request, env) {
+  if (!env.DB) {
+    return json({ error: "D1 binding DB belum tersedia." }, 500);
+  }
+
+  const url = new URL(request.url);
+  const id = url.searchParams.get("id");
+
+  if (!id) {
+    return json({ error: "Query parameter id wajib diisi." }, 400);
+  }
+
+  try {
+    await env.DB.prepare("DELETE FROM gallery WHERE id = ?").bind(id).run();
+    return json({ ok: true, id });
+  } catch (error) {
+    return json(
+      {
+        error: "Gagal menghapus gallery item dari D1.",
         detail: error instanceof Error ? error.message : "Unknown error",
       },
       500,
@@ -320,12 +467,24 @@ const worker = {
       return handleGetPackages(env);
     }
 
+    if (url.pathname === "/api/gallery" && request.method === "GET") {
+      return handleGetGallery(env);
+    }
+
     if (url.pathname === "/api/admin/packages" && request.method === "POST") {
       return handleUpsertPackage(request, env);
     }
 
     if (url.pathname === "/api/admin/packages" && request.method === "DELETE") {
       return handleDeletePackage(request, env);
+    }
+
+    if (url.pathname === "/api/admin/gallery" && request.method === "POST") {
+      return handleUpsertGallery(request, env);
+    }
+
+    if (url.pathname === "/api/admin/gallery" && request.method === "DELETE") {
+      return handleDeleteGallery(request, env);
     }
 
     if (url.pathname === "/api/admin/upload-image" && request.method === "POST") {

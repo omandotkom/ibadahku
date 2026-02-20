@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, ZoomIn, Play } from "lucide-react";
 import Container from "@/components/ui/Container";
@@ -18,7 +18,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 
 // Data galeri - mix foto dan video
 type GalleryItem = {
-  id: number;
+  id: number | string;
   src: string;
   alt: string;
   caption: string;
@@ -26,7 +26,7 @@ type GalleryItem = {
   type: "image" | "video";
 };
 
-const galleryItems: GalleryItem[] = [
+const staticGalleryItems: GalleryItem[] = [
   {
     id: 1000,
     src: "/assets/gallery/IMG_4291.mp4",
@@ -195,8 +195,27 @@ const categories = ["Semua", "Makkah", "Madinah", "Jamaah", "Video"];
 export default function Gallery() {
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
   const [activeCategory, setActiveCategory] = useState("Semua");
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(staticGalleryItems);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    async function fetchDynamicGallery() {
+      try {
+        const res = await fetch("/api/gallery");
+        if (res.ok) {
+          const json = await res.json();
+          if (Array.isArray(json.data)) {
+            // Gabungkan dynamic items (first) + static items
+            setGalleryItems([...json.data, ...staticGalleryItems]);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch dynamic gallery items", error);
+      }
+    }
+
+    void fetchDynamicGallery();
+  }, []);
 
   // Filter items by category
   const filteredItems =
