@@ -14,7 +14,6 @@ Panduan ini wajib diikuti oleh AI Agent saat membuat konten blog baru untuk webs
     *   "Ibadah Aman Tenang"
 *   **Konteks Waktu:** Selalu gunakan referensi tahun **2026** atau **masa depan** untuk menjaga relevansi jangka panjang. Hindari konten yang cepat kadaluarsa.
 *   **Tone of Voice:** Profesional, empatik, persuasif, dan Islami (namun tetap modern). Gunakan sapaan "Anda" atau "Sahabat Ibadahku".
-
 ## 2. Struktur Artikel
 
 Setiap artikel harus memiliki elemen berikut:
@@ -34,6 +33,8 @@ Setiap artikel harus memiliki elemen berikut:
 *   **Panjang:** Minimal 600 - 1000 kata.
 *   **Formatting:** Gunakan **bold** untuk kata kunci penting, *italic* untuk istilah asing/Arab, dan list (bullet points) untuk kemudahan membaca.
 *   **Internal Linking:** Wajib menyertakan tautan ke halaman paket (`/#packages`) atau kontak (`/cta`). Contoh: *"Untuk info lebih lanjut, cek [Paket Umroh 2026](#packages) kami."*
+
+Harus ada internal linking dan backlinknya juga ya 
 
 ### e. Gambar (Image Placeholder)
 *   Sertakan path gambar yang relevan (misal: `/images/blog/nama-topik.jpg`). Pastikan alt text deskriptif dan mengandung keyword.
