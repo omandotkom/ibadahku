@@ -83,7 +83,7 @@ function LegalCard({
   items: Array<{ label: string; value: string }>;
 }) {
   return (
-    <article className="rounded-2xl border border-[var(--border)] bg-white p-6 shadow-sm">
+    <article className="rounded-2xl border border-[var(--border)] bg-white p-4 shadow-sm sm:p-6">
       <h3 className="mb-5 font-serif text-2xl font-bold text-[var(--text-primary)]">{title}</h3>
       <ul className="space-y-4">
         {items.map((item, index) => (
@@ -101,7 +101,13 @@ function LegalCard({
             ) : (
               <>
                 <p className="text-sm font-medium text-[var(--text-secondary)]">{item.label}</p>
-                <p className="mt-1 break-words text-base font-semibold text-[var(--brand-green-dark)]">{item.value}</p>
+                <p
+                  className={`mt-1 text-base font-semibold text-[var(--brand-green-dark)] ${
+                    item.value.length > 25 ? "break-all" : "break-words"
+                  }`}
+                >
+                  {item.value}
+                </p>
               </>
             )}
           </li>
