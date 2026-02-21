@@ -7,12 +7,16 @@
 - Network:       http://192.168.0.2:3000
 
 ✓ Starting...
-✓ Ready in 1084ms
-○ Compiling /blog ...
- GET /blog/ 200 in 6.4s (compile: 5.7s, render: 678ms)
- GET /blog/tips-memilih-travel-umroh-terpercaya-2025/ 200 in 1813ms (compile: 1585ms, generate-params: 598ms, render: 228ms)
-Persisting failed: Unable to write SST file 00000048.sst
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
 
-Caused by:
-    No such file or directory (os error 2)
-Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+✓ Ready in 1099ms
+○ Compiling / ...
+ GET / 200 in 12.9s (compile: 11.6s, render: 1295ms)
+ GET /images/package-reguler.jpg 404 in 2.0s (compile: 1681ms, render: 354ms)
+ GET /images/package-plus.jpg 404 in 798ms (compile: 330ms, render: 469ms)
+ GET /api/gallery/ 404 in 434ms (compile: 22ms, render: 412ms)
+ GET /api/packages/ 404 in 441ms (compile: 183ms, render: 258ms)
+[?25h
