@@ -32,7 +32,7 @@ export const siteConfig: SiteConfig = {
 export const navItems: NavItem[] = [
   { label: "Beranda", href: "/" },
   { label: "Paket Umroh", href: "/#packages" },
-  { label: "Artikel", href: "/#articles" },
+  { label: "Blog", href: "/blog" },
   { label: "Tentang Kami", href: "/#about" },
 ];
 
