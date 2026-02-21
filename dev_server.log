@@ -1,0 +1,13 @@
+
+> my-app@0.1.0 dev
+> next dev
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+
+✓ Starting...
+✓ Ready in 1084ms
+○ Compiling /blog ...
+ GET /blog/ 200 in 6.4s (compile: 5.7s, render: 678ms)
+ GET /blog/tips-memilih-travel-umroh-terpercaya-2025/ 200 in 1813ms (compile: 1585ms, generate-params: 598ms, render: 228ms)
