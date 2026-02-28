@@ -11,19 +11,67 @@ import { Play, Pause, ChevronLeft, ChevronRight } from "lucide-react";
  * Overlay "Selamat Datang" center vertikal horizontal
  * Responsive untuk web dan mobile
  * 
+ * Optimasi gambar:
+ * - Multiple formats (AVIF, WebP, JPEG)
+ * - Responsive sizes (sm, md, lg, xl)
+ * - Lazy loading untuk performa optimal
+ * 
  * @component
  */
+
+// Responsive image configuration
+const HERO_IMAGE_BASE = "/assets/hero-optimized/hero";
+
+interface ResponsiveImage {
+  src: string;
+  srcSet: string;
+  sizes: string;
+  alt: string;
+}
+
+function getResponsiveImage(): ResponsiveImage {
+  // Generate srcset untuk berbagai format dan ukuran
+  const sizes = [
+    { width: 480, suffix: "sm" },
+    { width: 768, suffix: "md" },
+    { width: 1200, suffix: "lg" },
+    { width: 1920, suffix: "xl" },
+  ];
+
+  // AVIF format (prioritas tertinggi - ukuran terkecil, kualitas tinggi)
+  const avifSrcSet = sizes
+    .map((s) => `${HERO_IMAGE_BASE}-${s.suffix}.avif ${s.width}w`)
+    .join(", ");
+
+  // WebP format (fallback untuk browser yang tidak support AVIF)
+  const webpSrcSet = sizes
+    .map((s) => `${HERO_IMAGE_BASE}-${s.suffix}.webp ${s.width}w`)
+    .join(", ");
+
+  // JPEG format (fallback universal)
+  const jpegSrcSet = sizes
+    .map((s) => `${HERO_IMAGE_BASE}-${s.suffix}.jpg ${s.width}w`)
+    .join(", ");
+
+  return {
+    src: `${HERO_IMAGE_BASE}-xl.jpg`, // Fallback default
+    srcSet: `${avifSrcSet}, ${webpSrcSet}, ${jpegSrcSet}`,
+    sizes: "100vw", // Full viewport width
+    alt: "Pemandangan Ka'bah yang megah di Makkah",
+  };
+}
 
 export default function HeroSlider() {
   const [currentSlide, setCurrentSlide] = useState(0); // 0 = image, 1 = video
   const [isPlaying, setIsPlaying] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  const heroImage = getResponsiveImage();
+
   const slides = [
     {
       type: "image",
-      src: "/assets/hero-image.jpg",
-      alt: "Pemandangan Ka'bah yang megah di Makkah",
+      ...heroImage,
     },
     {
       type: "video",
@@ -72,7 +120,7 @@ export default function HeroSlider() {
       {/* Slides Container */}
       <AnimatePresence mode="wait">
         {currentSlide === 0 ? (
-          // Image Slide (Default)
+          // Image Slide (Default) dengan optimasi format
           <motion.div
             key="image"
             initial={{ opacity: 0 }}
@@ -81,13 +129,32 @@ export default function HeroSlider() {
             transition={{ duration: 0.8 }}
             className="absolute inset-0"
           >
-            <img
-              src={slides[0].src}
-              alt={slides[0].alt}
-              className="w-full h-full object-cover"
-              loading="eager"
-              decoding="async"
-            />
+            <picture>
+              {/* AVIF - Format paling efisien (prioritas tertinggi) */}
+              <source
+                type="image/avif"
+                srcSet={`${HERO_IMAGE_BASE}-sm.avif 480w, ${HERO_IMAGE_BASE}-md.avif 768w, ${HERO_IMAGE_BASE}-lg.avif 1200w, ${HERO_IMAGE_BASE}-xl.avif 1920w`}
+                sizes="100vw"
+              />
+              {/* WebP - Format efisien dengan dukungan browser luas */}
+              <source
+                type="image/webp"
+                srcSet={`${HERO_IMAGE_BASE}-sm.webp 480w, ${HERO_IMAGE_BASE}-md.webp 768w, ${HERO_IMAGE_BASE}-lg.webp 1200w, ${HERO_IMAGE_BASE}-xl.webp 1920w`}
+                sizes="100vw"
+              />
+              {/* JPEG - Fallback universal */}
+              <img
+                src={`${HERO_IMAGE_BASE}-xl.jpg`}
+                srcSet={`${HERO_IMAGE_BASE}-sm.jpg 480w, ${HERO_IMAGE_BASE}-md.jpg 768w, ${HERO_IMAGE_BASE}-lg.jpg 1200w, ${HERO_IMAGE_BASE}-xl.jpg 1920w`}
+                sizes="100vw"
+                alt={slides[0].alt}
+                className="w-full h-full object-cover"
+                loading="eager"
+                decoding="async"
+                width={1920}
+                height={1080}
+              />
+            </picture>
           </motion.div>
         ) : (
           // Video Slide
@@ -107,7 +174,7 @@ export default function HeroSlider() {
               loop
               playsInline
               className="w-full h-full object-cover"
-              poster={slides[0].src}
+              poster={`${HERO_IMAGE_BASE}-lg.jpg`}
             />
             {/* Video Play/Pause Button */}
             <button
