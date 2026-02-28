@@ -212,7 +212,15 @@ export default function Navbar() {
                       >
                         <Link
                           href={item.href}
-                          onClick={() => setIsMobileMenuOpen(false)}
+                          onClick={(event) => {
+                            setIsMobileMenuOpen(false);
+
+                            // Force hard navigation on route links to avoid rare mobile overlay/nav race conditions
+                            if (item.href.startsWith("/") && !item.href.startsWith("/#")) {
+                              event.preventDefault();
+                              window.location.assign(item.href);
+                            }
+                          }}
                           className="
                             block px-4 py-4 rounded-xl text-base font-medium
                             text-[var(--text-primary)] hover:text-[var(--brand-green-primary)]
