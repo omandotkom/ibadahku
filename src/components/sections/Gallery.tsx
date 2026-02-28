@@ -226,12 +226,10 @@ export default function Gallery() {
   // Lightbox navigation
   const openLightbox = (index: number) => {
     setSelectedItem(index);
-    document.body.style.overflow = "hidden";
   };
 
   const closeLightbox = () => {
     setSelectedItem(null);
-    document.body.style.overflow = "";
   };
 
   const nextItem = () => {
@@ -247,6 +245,19 @@ export default function Gallery() {
       );
     }
   };
+
+
+  useEffect(() => {
+    if (selectedItem === null) {
+      document.body.style.overflow = "";
+      return;
+    }
+
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [selectedItem]);
 
   return (
     <section id="gallery" className="py-20 lg:py-28 bg-white">

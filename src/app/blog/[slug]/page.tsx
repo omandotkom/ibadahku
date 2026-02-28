@@ -5,7 +5,7 @@ import { blogPosts } from "@/lib/blog-data";
 import Container from "@/components/ui/Container";
 import Navbar from "@/components/sections/Navbar";
 import Footer from "@/components/sections/Footer";
-import { Calendar, User, Tag, ArrowLeft, Facebook, Twitter, Linkedin, Share2 } from "lucide-react";
+import { Calendar, User, ArrowLeft, Facebook, Twitter, Linkedin, Share2 } from "lucide-react";
 
 /**
  * Generate Static Params for SSG

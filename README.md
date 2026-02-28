@@ -44,7 +44,7 @@ Development server akan berjalan di `http://localhost:3000`
 ## 📁 Struktur Project
 
 ```
-my-app/
+ibadahku/
 ├── src/
 │   ├── app/                    # Next.js App Router
 │   │   ├── globals.css         # Global styles & theme variables
@@ -72,7 +72,7 @@ my-app/
 │       └── index.ts            # TypeScript types
 ├── dist/                       # Static build output
 ├── next.config.ts              # Next.js configuration
-├── tailwind.config.ts          # Tailwind CSS configuration
+├── postcss.config.mjs         # PostCSS + Tailwind config
 └── package.json
 ```
 
@@ -185,3 +185,11 @@ Proprietary - ibadahku.id
 ---
 
 Dibuat dengan ❤️ untuk memudahkan perjalanan ibadah Anda.
+
+
+## ✅ Status Teknis Saat Ini
+
+- Frontend: static export ke `dist/`
+- Worker runtime: `workers/index.js`
+- API: `/api/packages`, `/api/gallery`, `/api/admin/*`, `/media/*`
+- CI GitHub Actions: lint + build pada push/PR (`.github/workflows/ci.yml`)

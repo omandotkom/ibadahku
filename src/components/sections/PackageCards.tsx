@@ -3,11 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
-  Calendar,
-  Clock,
-  Building2,
-  Plane,
-  Check,
+    Check,
   ArrowRight,
   Download,
   MessageCircle,

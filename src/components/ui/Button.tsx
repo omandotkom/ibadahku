@@ -43,6 +43,18 @@ const sizeStyles = {
   lg: "px-8 py-4 text-lg min-h-[48px]",
 };
 
+function MotionWrapper({ children, disabled }: { children: ReactNode; disabled: boolean }) {
+  return (
+    <motion.span
+      whileHover={{ scale: disabled ? 1 : 1.02 }}
+      whileTap={{ scale: disabled ? 1 : 0.98 }}
+      className="inline-block"
+    >
+      {children}
+    </motion.span>
+  );
+}
+
 export default function Button({
   children,
   variant = "primary",
@@ -77,20 +89,9 @@ export default function Button({
     </>
   );
 
-  // Motion wrapper for smooth animations
-  const MotionWrapper = ({ children }: { children: ReactNode }) => (
-    <motion.span
-      whileHover={{ scale: disabled ? 1 : 1.02 }}
-      whileTap={{ scale: disabled ? 1 : 0.98 }}
-      className="inline-block"
-    >
-      {children}
-    </motion.span>
-  );
-
   if (href) {
     return (
-      <MotionWrapper>
+      <MotionWrapper disabled={disabled}>
         <a
           href={href}
           className={classes}
@@ -104,7 +105,7 @@ export default function Button({
   }
 
   return (
-    <MotionWrapper>
+    <MotionWrapper disabled={disabled}>
       <button
         type={type}
         className={classes}

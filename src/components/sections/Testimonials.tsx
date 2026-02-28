@@ -58,7 +58,7 @@ function TestimonialCard({
 
       {/* Content */}
       <blockquote className="text-[var(--text-secondary)] leading-relaxed mb-6 relative">
-        "{testimonial.content}"
+        &ldquo;{testimonial.content}&rdquo;
       </blockquote>
 
       {/* Author */}

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { blogPosts } from "@/lib/blog-data";
 import Container from "@/components/ui/Container";
 import Navbar from "@/components/sections/Navbar";

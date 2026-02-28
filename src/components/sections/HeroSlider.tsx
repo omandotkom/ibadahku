@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Pause, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -17,7 +17,6 @@ import { Play, Pause, ChevronLeft, ChevronRight } from "lucide-react";
 export default function HeroSlider() {
   const [currentSlide, setCurrentSlide] = useState(0); // 0 = image, 1 = video
   const [isPlaying, setIsPlaying] = useState(true);
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const slides = [
@@ -33,13 +32,6 @@ export default function HeroSlider() {
     },
   ];
 
-  // Auto-play video when slide changes to video
-  useEffect(() => {
-    if (currentSlide === 1 && videoRef.current) {
-      videoRef.current.play();
-      setIsPlaying(true);
-    }
-  }, [currentSlide]);
 
   // Handle video play/pause
   const toggleVideo = () => {
@@ -56,14 +48,23 @@ export default function HeroSlider() {
   // Navigation
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
+    if (index !== 1) setIsPlaying(true);
   };
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
+    setCurrentSlide((prev) => {
+      const next = (prev + 1) % slides.length;
+      if (next !== 1) setIsPlaying(true);
+      return next;
+    });
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    setCurrentSlide((prev) => {
+      const next = (prev - 1 + slides.length) % slides.length;
+      if (next !== 1) setIsPlaying(true);
+      return next;
+    });
   };
 
   return (
@@ -105,7 +106,6 @@ export default function HeroSlider() {
               muted
               loop
               playsInline
-              onLoadedData={() => setIsVideoLoaded(true)}
               className="w-full h-full object-cover"
               poster={slides[0].src}
             />
