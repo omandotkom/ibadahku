@@ -1,8 +1,8 @@
 ﻿const JSON_HEADERS = {
   "content-type": "application/json; charset=utf-8",
 };
-const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
-const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+const MAX_UPLOAD_BYTES = 100 * 1024 * 1024;
+const ALLOWED_FILE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "video/mp4", "video/webm", "video/quicktime"]);
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -398,8 +398,8 @@ async function handleUploadImage(request, env) {
     return json({ error: "Field file wajib diisi." }, 400);
   }
 
-  if (!ALLOWED_IMAGE_TYPES.has(fileValue.type)) {
-    return json({ error: "Tipe file harus JPG, PNG, atau WEBP." }, 400);
+  if (!ALLOWED_FILE_TYPES.has(fileValue.type)) {
+    return json({ error: "Tipe file harus JPG, PNG, WEBP, MP4, WEBM, atau MOV." }, 400);
   }
 
   if (fileValue.size > MAX_UPLOAD_BYTES) {
